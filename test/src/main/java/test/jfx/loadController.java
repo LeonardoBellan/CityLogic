@@ -12,7 +12,7 @@ public class loadController {
         String saveId = ((Button) event.getSource()).getId().toString();
         int id = Integer.parseInt(saveId.replace("loadSave", ""));
         
-        //game load logic
+        //GameEngine.loadSave(id);
 
         App.setRoot("game");    
     }

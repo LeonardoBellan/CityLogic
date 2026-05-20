@@ -19,13 +19,18 @@ public class TileMapCanvas extends Canvas {
         Color.web("#c0504d"),  // ROOF       - red rooftop
     };
 
-    private final int[][] matrix;
+    private int[][] matrix;
     private final int tileSize;
 
-    public TileMapCanvas(int[][] matrix, int tileSize) {
-        super(matrix[0].length * tileSize, matrix.length * tileSize);
-        this.matrix   = matrix;
+    public TileMapCanvas(int tileSize) {
+        super();
         this.tileSize = tileSize;
+    }
+
+    public void setMap(int[][] newMap) {
+        this.matrix = newMap;
+        super.setWidth(matrix[0].length * tileSize);
+        super.setHeight(matrix.length * tileSize);
         draw();
     }
 
