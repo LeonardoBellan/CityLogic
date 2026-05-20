@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
+
+<StackPane xmlns="http://javafx.com/javafx/8.0.171"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="test.jfx.loadController"
+           styleClass="root-pane"
+           stylesheets="@styles.css">
+
+    <VBox alignment="CENTER" spacing="16" maxWidth="300" maxHeight="440"
+          styleClass="card">
+
+        <Label text="Load Game" styleClass="title-label"/>
+
+        <Separator styleClass="separator-primary" prefWidth="200"/>
+
+        <Button fx:id="loadSave1" text="💾  Save Slot 1" onAction="#loadSave"
+                prefWidth="180" styleClass="btn,btn-secondary"/>
+
+        <Button fx:id="loadSave2" text="💾  Save Slot 2" onAction="#loadSave"
+                prefWidth="180" styleClass="btn,btn-secondary"/>
+
+        <Button fx:id="loadSave3" text="💾  Save Slot 3" onAction="#loadSave"
+                prefWidth="180" styleClass="btn,btn-secondary"/>
+
+        <Separator styleClass="separator-secondary" prefWidth="200"/>
+
+        <Button fx:id="backButton" text="Back to Menu" onAction="#backToMenu"
+                prefWidth="180" styleClass="btn,btn-primary"/>
+
+    </VBox>
+</StackPane>

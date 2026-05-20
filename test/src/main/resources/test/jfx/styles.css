@@ -1,0 +1,163 @@
+/* ============================================================
+   styles.css  –  Sim Lite shared stylesheet
+   ============================================================ */
+
+/* ── Root / Backgrounds ─────────────────────────────────────── */
+
+.root-pane {
+    -fx-background-color: #1a1a2e;
+}
+
+.map-container {
+    -fx-background-color: #1a1a2e;
+}
+
+/* ── Modal card (menu / load / pause panels) ─────────────────── */
+
+.card {
+    -fx-background-color: #1e2a3a;
+    -fx-background-radius: 12;
+    -fx-border-color: #4a90d9;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-padding: 40 50;
+}
+
+/* ── Top / Bottom HUD bars ───────────────────────────────────── */
+
+.hud-bar {
+    -fx-background-color: rgba(0, 0, 0, 0.7);
+    -fx-padding: 10;
+    -fx-spacing: 10;
+}
+
+.hud-bar-bottom {
+    -fx-background-color: rgba(0, 0, 0, 0.7);
+    -fx-padding: 6 10;
+    -fx-spacing: 20;
+}
+
+/* ── Pause / dim overlay ─────────────────────────────────────── */
+
+.pause-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.65);
+}
+
+/* ── Separators ──────────────────────────────────────────────── */
+
+.separator-primary {
+    -fx-background-color: #4a90d9;
+}
+
+.separator-secondary {
+    -fx-background-color: #2d3f55;
+}
+
+/* ── Labels ──────────────────────────────────────────────────── */
+
+.title-label {
+    -fx-text-fill: white;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+.hud-label {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 12px;
+}
+
+.hint-label {
+    -fx-text-fill: #666666;
+    -fx-font-size: 11px;
+}
+
+/* ── Buttons (shared base) ───────────────────────────────────── */
+
+.btn {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+/* Primary – blue, used for main / positive actions */
+.btn-primary {
+    -fx-background-color: #4a90d9;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #5ba3f0;
+}
+
+/* Secondary – dark, used for neutral actions */
+.btn-secondary {
+    -fx-background-color: #2d3f55;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #3a5070;
+}
+
+/* Danger – red, used for destructive / exit actions */
+.btn-danger {
+    -fx-background-color: #8b2020;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #a82828;
+}
+
+/* Small toolbar buttons (zoom +/-) */
+.btn-toolbar {
+    -fx-background-color: #4a90d9;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.btn-toolbar:hover {
+    -fx-background-color: #5ba3f0;
+}
+
+/* ── Stat bar ────────────────────────────────────────────────── */
+
+.stat-bar {
+    -fx-background-color: rgba(0, 0, 0, 0.7);
+    -fx-padding: 6 14;
+    -fx-spacing: 24;
+}
+
+.stat-label {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 12px;
+}
+
+.stat-value {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.stat-value-positive {
+    -fx-text-fill: #4caf50;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.stat-value-negative {
+    -fx-text-fill: #e05050;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.stat-value-warning {
+    -fx-text-fill: #f0a500;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.stat-divider {
+    -fx-background-color: #2d3f55;
+    -fx-pref-width: 1;
+    -fx-pref-height: 20;
+}
