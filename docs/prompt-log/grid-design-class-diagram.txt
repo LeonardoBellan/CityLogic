@@ -1,0 +1,429 @@
+# 1
+Agisci come un Software Architect e Senior Developer.
+Ti fornirò il Domain Model e lo System Sequence Diagram per realizzare un progetto di un simulatore di città in cui l'utente deve costruire edifici all'interno di una mappa (griglia).
+Devo realizzare il design class diagram.
+Io mi occupo esclusivamente della della gestione della mappa e del modulo di piazzamento edifici, quindi escludi la logica centrale del gioco (Gestione delle risorse e tick di gioco), implementa solamente se strettamente necessario delle interfacce che definiscano i metodi che il modulo piazzamento risorse deve chiamare.
+
+Voglio che nel design delle classi e dei metodi vengano applicati rigorosamente:
+Voglio che nel design delle classi e dei metodi vengano applicati rigorosamente i principi GRASP e GoF:
+In particolare l'utilizzo di "Information expert" per la decisione dei metodi di validazione, "controller" per l'isolamento dei comandi che arrivano dall'interfaccia e "Low coupling/High coesion" per mantenere il modulo separato dal resto del sistema.
+Per i pattern GoF valuta se utilizzare una "simple factory" o "factory method" per la creazione degli edifici, ed un pattern "state" o tramite controller per la gestione della demolizione/costruzione .
+
+
+DOMAIN MODEL (Griglia ed edifici):
+```mermaid
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#f9f9f9',
+    'strokeColor': '#333333',
+    'lineColor': '#555555',
+    'fontSize': '13px',
+    'rx': 0, 'ry': 0
+  },
+  'config': { 'layout': 'orthogonal' }
+}}%%
+classDiagram
+    direction TB
+
+    class Player
+
+    class Resource {
+        type
+        amount
+    }
+
+    %% Map
+    class Cell {
+        position
+        isOccupied
+        pollutionLevel
+        activeBonus
+    }
+
+    class Grid {
+        width
+        height
+    }
+
+    %% Buildings
+    class Building {
+        position
+        operationalStatus
+        currentMaintenanceCost
+    }
+
+    class BuildingDescription {
+        name
+        constructionCost
+        baseMaintenanceCost
+        footprint
+        effectRadius
+    }
+
+    class EnvironmentalEffect {
+        type
+        intensity
+        radius
+    }
+
+
+
+
+    %% %%
+    Player "1" -- "1" Grid : manages
+    Player "1" -- "*" Resource : owns/accumulates
+    Player "1" -- "*" Building : builds/demolishes
+    Grid "1" *-- "400" Cell : consists of
+
+    Cell "0..1" --> "1" Building : hosts
+    Building "*" -- "1" BuildingDescription : based on
+    Building ..> Resource : produces
+    Building o-- EnvironmentalEffect : generates
+    EnvironmentalEffect "*" -- "*" Cell : affects
+```
+
+SYSTEM SEQUENCE DIAGRAM:
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player
+    participant System as :System
+
+    Note over Player, System: Construction Process
+    Player->>System: selectBuilding(buildingType)
+    System-->>Player: showPreview(buildingDetails)
+
+    loop During Drag/Hover
+        Player->>System: updatePosition(x,y)
+        System-->>Player: showPlacementValidity(isValid)
+    end
+
+    Player->>System: confirmPlacement(x,y)
+    opt Placement is valid
+        System-->>Player: updateMap(), deductBudget(), applyAreaEffects()
+    end
+
+    Note over Player, System: Resource Management & Lifecycle
+    Note right of System: System internally processes simulation tick
+
+    System-->>Player: updateResources(power, water, taxes)
+
+    alt Insufficient resources for building
+        System-->>Player: signalInactiveBuilding(position)
+    else Resources restored
+        System-->>Player: signalActiveBuilding(position)
+    end
+
+    Note over Player, System: Demolition Process
+    Player->>System: toggleDemolitionTool(active)
+    System-->>Player: updateCursorIcon(Demolition)
+
+    Player->>System: clickCell(x,y)
+    alt Cell occupied by building
+        System-->>Player: removeBuilding(), ceaseEffects()
+    else Cell empty
+        System-->>Player: feedbackError("No building to demolish")
+    end
+
+    Player->>System: deactivateDemolitionTool()
+    System-->>Player: restoreStandardCursor()
+```
+Dopo aver analizzato le informazioni:
+1. Spiega brevemente i pattern GRASP e GoF utilizzati e motiva le scelte di design.
+2. Identifica i metodi necessari per queste classi per gestire i flussi di selezione dell'edificio, aggiornamento della validità della posizione, conferma del piazzamento e demolizione.
+3. Definisci l'interfaccia di comunicazione verso la logica centrale del mio compagno (specificando i metodi di controllo budget e registrazione edificio).
+3. Se necessario definisci a grandi linee l'interfaccia di comunicazione verso la logica centrale e la gestione di politiche che modificano la produzione degli edifici.
+4. Genera il codice del design class diagram in formato mermaid includendo i modificatori di visibilità, tipi di dato per attributi e parametri e frecce di navigabilità.
+
+Ecco l'analisi architetturale e il Design Class Diagram (DCD) per il modulo di gestione mappa e piazzamento edifici, strutturato secondo le direttive da te fornite e i vincoli di isolamento dal resto del sistema.
+
+---
+
+## 1. Scelte di Design e Applicazione dei Pattern (GRASP & GoF)
+
+### Principi GRASP
+
+* **Controller (`GridController`):** Funge da punto di ingresso unico per gli eventi scatenati dall'interfaccia utente (UI). Isola il dominio disaccoppiando la UI dalla logica di business di posizionamento e demolizione.
+* **Information Expert:**
+* `Grid` possiede la conoscenza dell'intera mappa (le istanze di `Cell`). È l'esperto deputato a verificare se le coordinate sono nei limiti e se le celle richieste dall'ingombro (`footprint`) di un edificio sono libere.
+* `BuildingDescription` conosce il costo di costruzione, le dimensioni e gli effetti ambientali intrinseci del tipo di edificio.
+
+
+* **Low Coupling & High Cohesion:** Il modulo mappa non manipola direttamente il portafoglio del giocatore. Comunica con la logica centrale tramite un'interfaccia ben definita (`IGameCoreFacade`). Il modulo mappa si occupa *esclusivamente* di griglia, celle e ciclo di vita geometrico/strutturale degli edifici.
+
+### Pattern GoF (Gang of Four)
+
+* **Simple Factory (`BuildingFactory`):** Utilizziamo una Simple Factory per la creazione delle istanze di `Building`. Centralizza la logica di istanziazione partendo da un `BuildingDescription` e assegna lo stato iniziale, mantenendo il controller pulito e disaccoppiato dalle classi concrete degli edifici.
+    * **Controller-driven modes (semplice e pratico):** Invece di modellare l'interazione con un pattern `State` separato, manteniamo la logica di modalità (piazzamento / demolizione) all'interno di `GridController` tramite flag o piccoli handler strategici. Questo mantiene il design più semplice quando le modalità sono poche e strettamente legate al controller.
+
+
+
+---
+
+## 2. Identificazione dei Metodi e Flussi di Sistema
+
+* **Selezione Edificio:** Il `GridController` riceve il comando, richiede la descrizione del tipo alla configurazione e imposta la modalità di interazione su *placement*, selezionando la `BuildingDescription` corrente e mostrando l'anteprima.
+* **Validazione Posizione:** `Grid.validatePlacement(x, y, footprint)` analizza l'array bidimensionale di celle a partire dall'ancora $(x,y)$. Verifica che i confini non vengano superati e che `Cell.isOccupied` sia falso per tutte le celle impattate.
+* **Conferma Piazzamento:** Il `GridController` interroga la logica centrale per i fondi. Se l'esito è positivo, chiama la `BuildingFactory` per creare l'istanza, occupa le celle sulla `Grid`, applica gli effetti ambientali nel raggio d'azione (`effectRadius`) e notifica il core del gioco per la sottrazione del budget.
+* **Demolizione:** Quando la modalità è *demolition*, il `GridController` al click $(x,y)$ recupera l'edificio tramite la cella, azzera gli effetti d'area, libera tutte le celle precedentemente occupate dall'ingombro dell'edificio e notifica la logica centrale della rimozione.
+
+---
+
+## 3. Interfaccia di Comunicazione verso la Logica Centrale
+
+Per garantire il **Low Coupling**, definiamo l'interfaccia `IGameCoreFacade`. Questo è il contratto che il modulo del tuo collega deve implementare e che il tuo modulo consumerà:
+
+```java
+public interface IGameCoreFacade {
+    boolean hasEnoughResources(BuildingDescription description);
+    void deductConstructionCosts(BuildingDescription description);
+    void registerBuilding(Building building);
+    void unregisterBuilding(Building building);
+}
+
+```
+
+---
+
+## 4. Design Class Diagram (Mermaid)
+
+Di seguito viene riportato il diagramma delle classi completo di modificatori di visibilità, tipi di dato, direzioni di navigabilità e relazioni formali (aggregazione, composizione, dipendenza e realizzazione).
+
+```mermaid
+classDiagram
+    direction TB
+
+    %% INTERFACCE E CORE ESTERNO (DISACCOPPIAMENTO)
+    class IGameCoreFacade {
+        <<interface>>
+        +hasEnoughResources(description: BuildingDescription) boolean
+        +deductConstructionCosts(description: BuildingDescription) void
+        +registerBuilding(building: Building) void
+        +unregisterBuilding(building: Building) void
+    }
+
+    %% CONTROLLER (GRASP)
+    class GridController {
+        -gameCore: IGameCoreFacade
+        -grid: Grid
+        -selectedDescription: BuildingDescription
+        -mode: String "placement|demolition"
+        +selectBuilding(type: String) BuildingDescription
+        +updatePosition(x: int, y: int) boolean
+        +confirmPlacement(x: int, y: int) void
+        +toggleDemolitionTool(active: boolean) void
+        +clickCell(x: int, y: int) void
+    }
+
+    %% GOF SIMPLE FACTORY
+    class BuildingFactory {
+        +createBuilding(description: BuildingDescription, x: int, y: int) Building
+    }
+
+    %% DOMINIO LOCALE (MAPPA ED EDIFICI)
+    class Grid {
+        -width: int
+        -height: int
+        -cells: Cell[][]
+        +getCell(x: int, y: int) Cell
+        +validatePlacement(x: int, y: int, footprint: Vector2D) boolean
+        +placeBuilding(building: Building) void
+        +removeBuilding(building: Building) void
+    }
+
+    class Cell {
+        -position: Vector2D
+        -isOccupied: boolean
+        -pollutionLevel: int
+        -activeBonus: int
+        -currentBuilding: Building
+        +setBuilding(building: Building) void
+        +clear() void
+        +addPollution(level: int) void
+    }
+
+    class Building {
+        -position: Vector2D
+        -operationalStatus: boolean
+        -currentMaintenanceCost: int
+        -description: BuildingDescription
+        -effects: List~EnvironmentalEffect~
+        +getPosition() Vector2D
+        +getDescription() BuildingDescription
+        +getEffects() List~EnvironmentalEffect~
+        +setOperationalStatus(status: boolean) void
+    }
+
+    class BuildingDescription {
+        -name: String
+        -constructionCost: int
+        -baseMaintenanceCost: int
+        -footprint: Vector2D
+        -effectRadius: int
+        +getFootprint() Vector2D
+        +getConstructionCost() int
+        +getEffectRadius() int
+    }
+
+    class EnvironmentalEffect {
+        -type: String
+        -intensity: int
+        -radius: int
+        +applyEffect(grid: Grid, center: Vector2D) void
+        +removeEffect(grid: Grid, center: Vector2D) void
+    }
+
+    class Vector2D {
+        +x: int
+        +y: int
+    }
+
+    %% RELAZIONI E NAVIGABILITÀ
+    GridController --> IGameCoreFacade : comunica tramite
+    GridController *-- Grid : possiede e comanda
+    GridController ..> ProductionDisplayInfo : crea per UI
+    GridController --> BuildingFactory : usa per istanziare
+    GridController --> Grid : interroga/modifica
+    
+    BuildingFactory ..> Building : istanzia
+    
+    Grid *-- Cell : composto da (400 celle)
+    Cell "0..1" --> "1" Building : ospita
+
+    Building "*" --> "1" BuildingDescription : istanziato da
+    Building o-- EnvironmentalEffect : genera
+    
+    Cell ..> Vector2D : usa
+    BuildingDescription ..> Vector2D : usa
+
+```
+
+# 2
+
+Spiega a grandi linee come verrebbe implementato un sistema di leggi/policy che modificano la produzione di risorse dei vari edifici, sempre utilizzando i principi GRASP/GoF.
+
+Per implementare un sistema di **leggi e politiche (Policy/Laws)** che modificano la produzione degli edifici in modo elegante, scalabile e rispettando i principi di **Low Coupling** e **High Cohesion**, dobbiamo evitare di inserire blocchi di `if/else` o `switch` all'interno della classe `Building` o nel loop di simulazione principale.
+
+Le leggi sono dinamiche, possono essere attivate o disattivate dal giocatore, e possono influenzare solo determinate categorie di edifici (es. "Sussidi verdi" che aumentano la produzione delle centrali solari ma tassano le industrie pesanti).
+
+Ecco come progettarlo applicando i pattern GoF e GRASP:
+
+---
+
+## 1. Architettura del Sistema: Pattern GoF Utilizzati
+
+### Decorator Pattern (Alternativa Strutturale) o Strategy Pattern (Scelta Consigliata)
+
+Per modificare i comportamenti di produzione in tempo reale, il pattern più indicato è lo **Strategy Pattern**, combinato con un approccio a **Modificatori (Modifier List)**.
+
+Ogni `Building` delega il calcolo della sua produzione a un oggetto strategia o calcola la produzione base per poi farla passare attraverso una catena di modificatori attivi.
+
+### Observer Pattern
+
+Il modulo delle leggi deve notificare il sistema quando una legge viene promulgata o abrogata. Gli edifici (o i manager che li gestiscono) si iscrivono come **Observer** agli eventi del `PolicyManager`. Quando una legge cambia, gli edifici aggiornano i propri modificatori interni di produzione.
+
+---
+
+## 2. Applicazione dei Principi GRASP
+
+* **Information Expert:** Chi calcola la produzione finale? L'edificio stesso (`Building`), perché possiede i dati di produzione base (`BuildingDescription`) e la lista dei modificatori attivi su di sé.
+* **Polymorphism:** Le leggi non vengono gestite con ID numerici e controlli condizionali. Ogni legge implementa un'interfaccia comune (`Policy`) e definisce polimorficamente *cosa* modifica e *a chi* si applica.
+
+---
+
+## 3. Struttura delle Classi e Interfacce
+
+Ecco come si articola il design per estendere il tuo modulo:
+
+### L'interfaccia delle Politiche (`Policy`)
+
+Ogni legge è un oggetto autonomo.
+
+```java
+public interface Policy {
+    String getName();
+    // Determina se la legge si applica a un determinato tipo di edificio
+    boolean appliesTo(BuildingDescription description);
+    // Modifica la risorsa prodotta (es. incrementa del 20% o aggiunge un valore fisso)
+    Resource modifyProduction(Building building, Resource baseResource);
+}
+
+```
+
+### Esempio di una Legge Concreta (`GreenSubsidyPolicy`)
+
+```java
+public class GreenSubsidyPolicy implements Policy {
+    @Override
+    public boolean appliesTo(BuildingDescription description) {
+        return description.getName().equals("SolarPlant");
+    }
+
+    @Override
+    public Resource modifyProduction(Building building, Resource baseResource) {
+        if (baseResource.getType().equals("Power")) {
+            // Incrementa la produzione di energia del 20%
+            int newAmount = (int) (baseResource.getAmount() * 1.20);
+            return new Resource("Power", newAmount);
+        }
+        return baseResource;
+    }
+}
+
+```
+
+---
+
+## 4. Integrazione nel ciclo di calcolo (L'Esperto dell'Informazione)
+
+La classe `Building` mantiene al suo interno una lista di modificatori/leggi attive che la riguardano, oppure interroga il registro centrale delle leggi quando il Game Core richiede il calcolo delle risorse durante il "tick".
+
+Ecco come cambia il metodo di produzione in `Building`:
+
+```java
+public class Building {
+    private BuildingDescription description;
+    private List<Policy> activeAppliedPolicies = new ArrayList<>();
+
+    // Metodo chiamato dal Game Core ad ogni tick di gioco
+    public List<Resource> calculateCurrentProduction() {
+        // 1. Prendi la produzione base dalla descrizione (Information Expert)
+        List<Resource> production = new ArrayList<>(description.getBaseProduction());
+
+        // 2. Applica i modificatori delle leggi attive in modo polimorfico
+        for (Policy policy : activeAppliedPolicies) {
+            for (int i = 0; i < production.size(); i++) {
+                Resource modified = policy.modifyProduction(this, production.get(i));
+                production.set(i, modified);
+            }
+        }
+
+        return production;
+    }
+
+    // Metodi per l'Observer Pattern gestiti dal PolicyManager
+    public void addPolicy(Policy policy) {
+        if (policy.appliesTo(this.description)) {
+            activeAppliedPolicies.add(policy);
+        }
+    }
+
+    public void removePolicy(Policy policy) {
+        activeAppliedPolicies.remove(policy);
+    }
+}
+
+```
+
+---
+
+## 5. Il Manager Centrale delle Leggi (`PolicyManager`)
+
+Per mantenere il tuo modulo (Mappa e Piazzamento) isolato, il `PolicyManager` farà parte della logica centrale (o sarà un sottomodulo speculare). Quando l'utente attiva una legge tramite la UI delle politiche:
+
+1. Il `PolicyManager` registra la nuova legge attiva.
+2. Tramite l'**Observer Pattern**, il `PolicyManager` notifica tutti i `Building` esistenti (oppure notifica la `Grid` che fa da passamano).
+3. Gli edifici che rispondono positivamente a `policy.appliesTo(description)` aggiungono la legge alla loro lista locale.
+4. Al tick successivo, la produzione rifletterà istantaneamente i bonus/malus della legge senza che il codice di simulazione centrale debba conoscere i dettagli di quale edificio è influenzato da cosa.
+
