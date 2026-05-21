@@ -76,11 +76,11 @@ classDiagram
     Player "1" -- "*" Building : builds/demolishes
     Grid "1" *-- "400" Cell : consists of
 
-    Building "0..1" -- "1..*" Cell : occupies
-    Building "*" -- "1" BuildingDescription : based on
-    Building "*" -- "*" Resource : consumes/produces
-    Building "1" -- "0..*" EnvironmentalEffect : generates
-    EnvironmentalEffect "*" -- "*" Cell : affects
+    Cell "0..1" --> "1" Building : hosts
+    Building "*" -- "1" BuildingDescription : based on
+    Building ..> Resource : produces
+    Building o-- EnvironmentalEffect : generates
+    EnvironmentalEffect "*" -- "*" Cell : affects
 ```
 
 SYSTEM SEQUENCE DIAGRAM:
@@ -155,9 +155,7 @@ Ecco l'analisi architetturale e il Design Class Diagram (DCD) per il modulo di g
 ### Pattern GoF (Gang of Four)
 
 * **Simple Factory (`BuildingFactory`):** Utilizziamo una Simple Factory per la creazione delle istanze di `Building`. Centralizza la logica di istanziazione partendo da un `BuildingDescription` e assegna lo stato iniziale, mantenendo il controller pulito e disaccoppiato dalle classi concrete degli edifici.
-* **State Pattern (Gestione Modalità Interazione):** Invece di riempire il controller di controlli condizionali (`if (isDemolishing)`), incapsuliamo il comportamento dell'interazione in uno **State Pattern**.
-* L'interfaccia `InteractionState` definisce l'azione al click sulla mappa.
-* Le implementazioni concrete `PlacementState` e `DemolitionState` gestiscono rispettivamente la logica di costruzione (previa convalida) e di rimozione, permettendo una transizione fluida e scalabile tra gli strumenti di gioco.
+    * **Controller-driven modes (semplice e pratico):** Invece di modellare l'interazione con un pattern `State` separato, manteniamo la logica di modalità (piazzamento / demolizione) all'interno di `GridController` tramite flag o piccoli handler strategici. Questo mantiene il design più semplice quando le modalità sono poche e strettamente legate al controller.
 
 
 
@@ -165,10 +163,10 @@ Ecco l'analisi architetturale e il Design Class Diagram (DCD) per il modulo di g
 
 ## 2. Identificazione dei Metodi e Flussi di Sistema
 
-* **Selezione Edificio:** Il `GridController` riceve il comando, richiede la descrizione del tipo alla configurazione e istanzia un `PlacementState`, passandolo al contesto di interazione.
+* **Selezione Edificio:** Il `GridController` riceve il comando, richiede la descrizione del tipo alla configurazione e imposta la modalità di interazione su *placement*, selezionando la `BuildingDescription` corrente e mostrando l'anteprima.
 * **Validazione Posizione:** `Grid.validatePlacement(x, y, footprint)` analizza l'array bidimensionale di celle a partire dall'ancora $(x,y)$. Verifica che i confini non vengano superati e che `Cell.isOccupied` sia falso per tutte le celle impattate.
-* **Conferma Piazzamento:** Il `PlacementState` interroga la logica centrale per i fondi. Se l'esito è positivo, invoca la factory, occupa le celle sulla `Grid`, applica gli effetti ambientali nel raggio d'azione (`effectRadius`) e notifica il core del gioco per la sottrazione del budget.
-* **Demolizione:** Il `DemolitionState` interviene sul click $(x,y)$, recupera l'edificio tramite la cella, azzera gli effetti d'area, libera tutte le celle precedentemente occupate dall'ingombro dell'edificio e distrugge l'istanza.
+* **Conferma Piazzamento:** Il `GridController` interroga la logica centrale per i fondi. Se l'esito è positivo, chiama la `BuildingFactory` per creare l'istanza, occupa le celle sulla `Grid`, applica gli effetti ambientali nel raggio d'azione (`effectRadius`) e notifica il core del gioco per la sottrazione del budget.
+* **Demolizione:** Quando la modalità è *demolition*, il `GridController` al click $(x,y)$ recupera l'edificio tramite la cella, azzera gli effetti d'area, libera tutte le celle precedentemente occupate dall'ingombro dell'edificio e notifica la logica centrale della rimozione.
 
 ---
 
@@ -205,34 +203,17 @@ classDiagram
         +unregisterBuilding(building: Building) void
     }
 
-    %% CONTROLLER & STATI (GRASP / GoF STATE)
+    %% CONTROLLER (GRASP)
     class GridController {
         -gameCore: IGameCoreFacade
         -grid: Grid
-        -currentState: InteractionState
         -selectedDescription: BuildingDescription
+        -mode: String "placement|demolition"
         +selectBuilding(type: String) BuildingDescription
         +updatePosition(x: int, y: int) boolean
         +confirmPlacement(x: int, y: int) void
         +toggleDemolitionTool(active: boolean) void
         +clickCell(x: int, y: int) void
-        +setState(state: InteractionState) void
-    }
-
-    class InteractionState {
-        <<interface>>
-        +handleCellClick(x: int, y: int) void
-    }
-
-    class PlacementState {
-        -controller: GridController
-        -description: BuildingDescription
-        +handleCellClick(x: int, y: int) void
-    }
-
-    class DemolitionState {
-        -controller: GridController
-        +handleCellClick(x: int, y: int) void
     }
 
     %% GOF SIMPLE FACTORY
@@ -301,22 +282,17 @@ classDiagram
     %% RELAZIONI E NAVIGABILITÀ
     GridController --> IGameCoreFacade : comunica tramite
     GridController *-- Grid : possiede e comanda
-    GridController *-- InteractionState : mantiene lo stato corrente
-    
-    InteractionState <|.. PlacementState : implementa
-    InteractionState <|.. DemolitionState : implementa
-    
-    PlacementState --> BuildingFactory : usa per istanziare
-    PlacementState --> Grid : interroga/modifica
-    DemolitionState --> Grid : interroga/modifica
+    GridController ..> ProductionDisplayInfo : crea per UI
+    GridController --> BuildingFactory : usa per istanziare
+    GridController --> Grid : interroga/modifica
     
     BuildingFactory ..> Building : istanzia
     
     Grid *-- Cell : composto da (400 celle)
-    Cell "0..1" --> "0..1" Building : ospita
-    
+    Cell "0..1" --> "1" Building : ospita
+
     Building "*" --> "1" BuildingDescription : istanziato da
-    Building *-- EnvironmentalEffect : genera
+    Building o-- EnvironmentalEffect : genera
     
     Cell ..> Vector2D : usa
     BuildingDescription ..> Vector2D : usa

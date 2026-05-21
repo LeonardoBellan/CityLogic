@@ -8,7 +8,6 @@
     'strokeColor': '#333333',
     'lineColor': '#555555',
     'fontSize': '13px',
-    'rx': 0, 'ry': 0
   },
   'config': { 'layout': 'orthogonal' }
 }}%%
@@ -57,18 +56,16 @@ classDiagram
     }
 
 
-
-
     %% %%
     Player "1" -- "1" Grid : manages
     Player "1" -- "*" Resource : owns/accumulates
     Player "1" -- "*" Building : builds/demolishes
     Grid "1" *-- "400" Cell : consists of
 
-    Building "0..1" -- "1..*" Cell : occupies
-    Building "*" -- "1" BuildingDescription : based on
-    Building "*" -- "*" Resource : consumes/produces
-    Building "1" -- "0..*" EnvironmentalEffect : generates
+    Cell "0..1" --> "1" Building : hosts
+    Building "*" -- "1" BuildingDescription : based on (Immutable Metadata)
+    Building ..> Resource : produces
+    Building o-- EnvironmentalEffect : generates
     EnvironmentalEffect "*" -- "*" Cell : affects
 ```
 
@@ -126,128 +123,226 @@ sequenceDiagram
 classDiagram
     direction TB
 
-    %% INTERFACCE E CORE ESTERNO (DISACCOPPIAMENTO)
+    %% ==========================================
+    %% 1. ENUMERATIONS AND BASE DATA STRUCTURES
+    %% ==========================================
+    class ToolType {
+        <<enumeration>>
+        NONE
+        PLACEMENT
+        DEMOLITION
+    }
+
+    class Dimension {
+        <<struct>>
+        +width: int
+        +height: int
+    }
+
+    class Resource {
+        <<value object>>
+        -type: String
+        -amount: int
+        +getType() String
+        +getAmount() int
+    }
+
+    class ProductionDisplayDetails {
+        <<DTO - Data Transfer Object>>
+        %% Data sent to the UI to show the preview
+        +isValidPlacement: boolean
+        +baseValue: int
+        +modifierBonus: int
+        +finalValue: int
+        +bonusLabel: String
+    }
+
+    %% ==========================================
+    %% 2. RULES AND ADJACENCY SYSTEM (STRATEGY)
+    %% ==========================================
+    class IPlacementRule {
+        <<interface>>
+        %% Generic spatial/logical placement rule
+        +isValid(x: int, y: int, map: MapManager) boolean
+    }
+
+    class RoadAdjacencyRule {
+        %% Example: "Valid only if there is an adjacent road"
+        +isValid(x: int, y: int, map: MapManager) boolean
+    }
+
+    %% ==========================================
+    %% 3. POLICY SYSTEM (OBSERVER) - External Module
+    %% ==========================================
+    class PolicyChangeEvent {
+        -policy: Policy
+        -isActivated: boolean
+        +getPolicy() Policy
+        +isActivated() boolean
+    }
+
+    class IPolicyObserver {
+        <<interface>>
+        +onPolicyChanged(event: PolicyChangeEvent) void
+    }
+
+    class Policy {
+        <<interface>>
+        +getName() String
+        +appliesTo(description: BuildingDescription) boolean
+        +modifyProduction(building: Building, baseResource: Resource) Resource
+    }
+
+    class GreenSubsidyPolicy {
+        +getName() String
+        +appliesTo(description: BuildingDescription) boolean
+        +modifyProduction(building: Building, baseResource: Resource) Resource
+    }
+
+    %% ==========================================
+    %% 4. CENTRAL ORCHESTRATION (FACADE & CORE)
+    %% ==========================================
     class IGameCoreFacade {
         <<interface>>
-        +hasEnoughResources(description: BuildingDescription) boolean
-        +deductConstructionCosts(description: BuildingDescription) void
-        +registerBuilding(building: Building) void
-        +unregisterBuilding(building: Building) void
+        %% Masks the Core for the Controller: exposes only user input logic
+        +executeCellAction(x: int, y: int, toolType: ToolType, selectedDesc: BuildingDescription) boolean
+        +getBuildingDescriptionById(description_id: String) BuildingDescription
+        +getBuildingPreviewDetails(x: int, y: int, desc: BuildingDescription) ProductionDisplayDetails
     }
 
-    %% CONTROLLER & STATI (GRASP / GoF STATE)
-    class GridController {
+    class GameCore {
+        %% Orchestrator: Coordinates Map, Economy and Policies
+        -mapManager: MapManager
+        -activePolicies: List~Policy~
+        -policyObservers: List~IPolicyObserver~
+        -buildingCatalog: Map~String, BuildingDescription~
+
+        +executeCellAction(x: int, y: int, toolType: ToolType, selectedDesc: BuildingDescription) boolean
+        +getBuildingDescriptionById(description_id: String) BuildingDescription
+        +getBuildingPreviewDetails(x: int, y: int, desc: BuildingDescription) ProductionDisplayDetails
+
+        %% Internal logic methods and external modules
+        +registerPolicyObserver(observer: IPolicyObserver) void
+        +unregisterPolicyObserver(observer: IPolicyObserver) void
+        +activatePolicy(policy: Policy) void
+        -notifyPolicyObservers(event: PolicyChangeEvent) void
+        -hasEnoughResources(desc: BuildingDescription) boolean
+        -deductConstructionCosts(desc: BuildingDescription) void
+    }
+
+    %% ==========================================
+    %% 5. USER INTERFACE (CONTROLLER)
+    %% ==========================================
+    class MapController {
+        %% Middleman: converts UI input into GameCore calls
         -gameCore: IGameCoreFacade
-        -grid: Grid
-        -currentState: InteractionState
-        -selectedDescription: BuildingDescription
-        +selectBuilding(type: String) BuildingDescription
-        +updatePosition(x: int, y: int) boolean
-        +confirmPlacement(x: int, y: int) void
-        +toggleDemolitionTool(active: boolean) void
+        -currentTool: ToolType
+        -selectedBuildingDesc: BuildingDescription
         +clickCell(x: int, y: int) void
-        +setState(state: InteractionState) void
+        +hoverCell(x: int, y: int) void
+        +selectBuildingForPlacement(description_id: String) void
+        +toggleDemolitionTool(active: boolean) void
     }
 
-    class InteractionState {
-        <<interface>>
-        +handleCellClick(x: int, y: int) void
+    %% ==========================================
+    %% 6. MAP MANAGEMENT (GEOMETRY AND CELLS)
+    %% ==========================================
+    class MapManager {
+        %% Spatial Manager: Controls placement and coordinates, ignores economy
+        -dimensions: Dimension
+        -map: Cell[][]
+        -factory: BuildingFactory
+        +getCell(x: int, y: int) Cell
+        +validateSpatialPlacement(x: int, y: int, footprint: Dimension) boolean
+        +constructBuildingAt(x: int, y: int, desc: BuildingDescription) Building
+        +removeBuildingAt(x: int, y: int) Building
     }
 
-    class PlacementState {
-        -controller: GridController
-        -description: BuildingDescription
-        +handleCellClick(x: int, y: int) void
-    }
-
-    class DemolitionState {
-        -controller: GridController
-        +handleCellClick(x: int, y: int) void
-    }
-
-    %% GOF SIMPLE FACTORY
     class BuildingFactory {
+        <<simple factory>>
         +createBuilding(description: BuildingDescription, x: int, y: int) Building
     }
 
-    %% DOMINIO LOCALE (MAPPA ED EDIFICI)
-    class Grid {
-        -width: int
-        -height: int
-        -cells: Cell[][]
-        +getCell(x: int, y: int) Cell
-        +validatePlacement(x: int, y: int, footprint: Vector2D) boolean
-        +placeBuilding(building: Building) void
-        +removeBuilding(building: Building) void
-    }
-
     class Cell {
-        -position: Vector2D
-        -isOccupied: boolean
+        %% Base cell of the two-dimensional grid
+        -position: Point
         -pollutionLevel: int
-        -activeBonus: int
         -currentBuilding: Building
         +setBuilding(building: Building) void
         +clear() void
-        +addPollution(level: int) void
+        +getBuilding() Building
+        +isOccupied() boolean
     }
 
+    %% ==========================================
+    %% 7. GAME ENTITIES (BUILDINGS)
+    %% ==========================================
     class Building {
-        -position: Vector2D
+        %% Physical Instance: Building placed on the map
+        -position: Point
         -operationalStatus: boolean
-        -currentMaintenanceCost: int
         -description: BuildingDescription
-        -effects: List~EnvironmentalEffect~
-        +getPosition() Vector2D
+        -activeAppliedPolicies: List~Policy~
+        +onPolicyChanged(event: PolicyChangeEvent) void
+        +calculateCurrentProduction() List~Resource~
+        +getPosition() Point
         +getDescription() BuildingDescription
-        +getEffects() List~EnvironmentalEffect~
-        +setOperationalStatus(status: boolean) void
     }
 
     class BuildingDescription {
+        <<flyweight / metadata>>
+        %% Immutable Data: Costs, footprint and rules shared among similar instances
         -name: String
         -constructionCost: int
-        -baseMaintenanceCost: int
-        -footprint: Vector2D
-        -effectRadius: int
-        +getFootprint() Vector2D
+        -footprint: Dimension
+        -baseProduction: List~Resource~
+        -placementRules: List~IPlacementRule~
+        +getFootprint() Dimension
         +getConstructionCost() int
-        +getEffectRadius() int
+        +getBaseProduction() List~Resource~
+        +getPlacementRules() List~IPlacementRule~
     }
 
-    class EnvironmentalEffect {
-        -type: String
-        -intensity: int
-        -radius: int
-        +applyEffect(grid: Grid, center: Vector2D) void
-        +removeEffect(grid: Grid, center: Vector2D) void
-    }
+    %% ==========================================
+    %% ARCHITECTURAL RELATIONS AND DEPENDENCIES
+    %% ==========================================
 
-    class Vector2D {
-        +x: int
-        +y: int
-    }
+    %% UI Input and DTO
+    MapController --> ToolType : selects
+    IGameCoreFacade ..> ToolType : requires
+    MapController --> IGameCoreFacade : sends commands to
+    IGameCoreFacade <|.. GameCore : implements
+    GameCore ..> ProductionDisplayDetails : generates
+    MapController ..> ProductionDisplayDetails : reads
 
-    %% RELAZIONI E NAVIGABILITÀ
-    GridController --> IGameCoreFacade : comunica tramite
-    GridController *-- Grid : possiede e comanda
-    GridController *-- InteractionState : mantiene lo stato corrente
+    %% Core, Catalog and Dimensions
+    GameCore "1" o-- "*" BuildingDescription : contains catalog
+    BuildingDescription *-- Dimension : uses for footprint
+    MapManager *-- Dimension : uses for map size
 
-    InteractionState <|.. PlacementState : implementa
-    InteractionState <|.. DemolitionState : implementa
+    %% Adjacency and Validation Rules
+    BuildingDescription *-- IPlacementRule : defines rules per type
+    IPlacementRule <|.. RoadAdjacencyRule : implements
+    IPlacementRule ..> MapManager : analyzes adjacencies on
+    GameCore ..> IPlacementRule : executes validation
 
-    PlacementState --> BuildingFactory : usa per istanziare
-    PlacementState --> Grid : interroga/modifica
-    DemolitionState --> Grid : interroga/modifica
+    %% Map Orchestration and Factory
+    GameCore --> MapManager : orchestrates
+    MapManager *-- BuildingFactory : owns
+    MapManager *-- Cell : composed of
+    BuildingFactory ..> Building : instantiates
+    Cell "0..1" --> "1" Building : hosts
 
-    BuildingFactory ..> Building : istanzia
+    %% Observer Pattern (Policy)
+    IPolicyObserver <|.. Building : implements
+    GameCore "1" o-- "*" IPolicyObserver : notifies changes
+    Building ..> PolicyChangeEvent : reacts to
+    GameCore ..> PolicyChangeEvent : creates event
 
-    Grid *-- Cell : composto da (400 celle)
-    Cell "0..1" --> "0..1" Building : ospita
-
-    Building "*" --> "1" BuildingDescription : istanziato da
-    Building *-- EnvironmentalEffect : genera
-
-    Cell ..> Vector2D : usa
-    BuildingDescription ..> Vector2D : usa
+    %% Strategy Pattern and Building Meta-Data
+    Building "*" --> "1" BuildingDescription : reads base data from
+    Building "0..*" o-- "0..*" Policy : actively applies
+    Policy <|.. GreenSubsidyPolicy : implements
+    Building ..> Resource : generates
+    Policy ..> Resource : modifies
 ```
