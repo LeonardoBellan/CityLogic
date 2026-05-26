@@ -35,7 +35,7 @@ classDiagram
     }
 
     %% Buildings
-    class Building {
+    class BuildingInstance {
         position
         operationalStatus
         currentMaintenanceCost
@@ -59,13 +59,13 @@ classDiagram
     %% %%
     Player "1" -- "1" Grid : manages
     Player "1" -- "*" Resource : owns/accumulates
-    Player "1" -- "*" Building : builds/demolishes
+    Player "1" -- "*" BuildingInstance : builds/demolishes
     Grid "1" *-- "400" Cell : consists of
 
-    Cell "0..1" --> "1" Building : hosts
-    Building "*" -- "1" BuildingDescription : based on (Immutable Metadata)
-    Building ..> Resource : produces
-    Building o-- EnvironmentalEffect : generates
+    Cell "0..1" --> "1" BuildingInstance : hosts
+    BuildingInstance "*" -- "1" BuildingDescription : based on (Immutable Metadata)
+    BuildingInstance ..> Resource : produces
+    BuildingInstance o-- EnvironmentalEffect : generates
     EnvironmentalEffect "*" -- "*" Cell : affects
 ```
 
@@ -190,13 +190,13 @@ classDiagram
         <<interface>>
         +getName() String
         +appliesTo(description: BuildingDescription) boolean
-        +modifyProduction(building: Building, baseResource: Resource) Resource
+        +modifyProduction(building: BuildingInstance, baseResource: Resource) Resource
     }
 
     class GreenSubsidyPolicy {
         +getName() String
         +appliesTo(description: BuildingDescription) boolean
-        +modifyProduction(building: Building, baseResource: Resource) Resource
+        +modifyProduction(building: BuildingInstance, baseResource: Resource) Resource
     }
 
     %% ==========================================
@@ -205,7 +205,8 @@ classDiagram
     class IGameCoreFacade {
         <<interface>>
         %% Masks the Core for the Controller: exposes only user input logic
-        +executeCellAction(x: int, y: int, toolType: ToolType, selectedDesc: BuildingDescription) boolean
+        +constructBuilding(x: int, y: int, selectedDesc: BuildingDescription) boolean
+        +demolishBuilding(x: int, y: int) boolean
         +getBuildingDescriptionById(description_id: String) BuildingDescription
         +getBuildingPreviewDetails(x: int, y: int, desc: BuildingDescription) ProductionDisplayDetails
     }
@@ -217,14 +218,15 @@ classDiagram
         -policyObservers: List~IPolicyObserver~
         -buildingCatalog: Map~String, BuildingDescription~
 
-        +executeCellAction(x: int, y: int, toolType: ToolType, selectedDesc: BuildingDescription) boolean
+        +constructBuilding(x: int, y: int, selectedDesc: BuildingDescription) boolean
+        +demolishBuilding(x: int, y: int) boolean
         +getBuildingDescriptionById(description_id: String) BuildingDescription
         +getBuildingPreviewDetails(x: int, y: int, desc: BuildingDescription) ProductionDisplayDetails
 
         %% Internal logic methods and external modules
-        +registerPolicyObserver(observer: IPolicyObserver) void
-        +unregisterPolicyObserver(observer: IPolicyObserver) void
-        +activatePolicy(policy: Policy) void
+        ~registerPolicyObserver(observer: IPolicyObserver) void
+        ~unregisterPolicyObserver(observer: IPolicyObserver) void
+        ~activatePolicy(policy: Policy) void
         -notifyPolicyObservers(event: PolicyChangeEvent) void
         -hasEnoughResources(desc: BuildingDescription) boolean
         -deductConstructionCosts(desc: BuildingDescription) void
@@ -254,30 +256,30 @@ classDiagram
         -factory: BuildingFactory
         +getCell(x: int, y: int) Cell
         +validateSpatialPlacement(x: int, y: int, footprint: Dimension) boolean
-        +constructBuildingAt(x: int, y: int, desc: BuildingDescription) Building
-        +removeBuildingAt(x: int, y: int) Building
+        +constructBuildingAt(x: int, y: int, desc: BuildingDescription) BuildingInstance
+        +removeBuildingAt(x: int, y: int) BuildingInstance
     }
 
     class BuildingFactory {
         <<simple factory>>
-        +createBuilding(description: BuildingDescription, x: int, y: int) Building
+        +createBuilding(description: BuildingDescription, x: int, y: int) BuildingInstance
     }
 
     class Cell {
         %% Base cell of the two-dimensional grid
         -position: Point
         -pollutionLevel: int
-        -currentBuilding: Building
-        +setBuilding(building: Building) void
+        -currentBuilding: BuildingInstance
+        +setBuilding(building: BuildingInstance) void
         +clear() void
-        +getBuilding() Building
+        +getBuilding() BuildingInstance
         +isOccupied() boolean
     }
 
     %% ==========================================
     %% 7. GAME ENTITIES (BUILDINGS)
     %% ==========================================
-    class Building {
+    class BuildingInstance {
         %% Physical Instance: Building placed on the map
         -position: Point
         -operationalStatus: boolean
@@ -309,7 +311,6 @@ classDiagram
 
     %% UI Input and DTO
     MapController --> ToolType : selects
-    IGameCoreFacade ..> ToolType : requires
     MapController --> IGameCoreFacade : sends commands to
     IGameCoreFacade <|.. GameCore : implements
     GameCore ..> ProductionDisplayDetails : generates
@@ -330,19 +331,19 @@ classDiagram
     GameCore --> MapManager : orchestrates
     MapManager *-- BuildingFactory : owns
     MapManager *-- Cell : composed of
-    BuildingFactory ..> Building : instantiates
-    Cell "0..1" --> "1" Building : hosts
+    BuildingFactory ..> BuildingInstance : instantiates
+    Cell "0..1" --> "1" BuildingInstance : hosts
 
     %% Observer Pattern (Policy)
-    IPolicyObserver <|.. Building : implements
+    IPolicyObserver <|.. BuildingInstance : implements
     GameCore "1" o-- "*" IPolicyObserver : notifies changes
-    Building ..> PolicyChangeEvent : reacts to
+    BuildingInstance ..> PolicyChangeEvent : reacts to
     GameCore ..> PolicyChangeEvent : creates event
 
     %% Strategy Pattern and Building Meta-Data
-    Building "*" --> "1" BuildingDescription : reads base data from
-    Building "0..*" o-- "0..*" Policy : actively applies
+    BuildingInstance "*" --> "1" BuildingDescription : reads base data from
+    BuildingInstance "0..*" o-- "0..*" Policy : actively applies
     Policy <|.. GreenSubsidyPolicy : implements
-    Building ..> Resource : generates
+    BuildingInstance ..> Resource : generates
     Policy ..> Resource : modifies
 ```
