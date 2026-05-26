@@ -17,10 +17,6 @@ public class gameController {
     @FXML private Label      lblHappiness;
     @FXML private Label      lblDate;
 
-
-    //TODO:trovare il modo di non dover dichiarare questo qui e testare il change map tipo load controller per simulare il caricamento di una mappa da file
-    CityEngine cityEngine = new CityEngine();
-
     private TileMapCanvas tileMap;
     private boolean       isPaused   = false;
     private double        dragStartX, dragStartY;
@@ -38,12 +34,13 @@ public class gameController {
         mapContainer.getChildren().add(tileMap);
 
         
-        cityEngine.pcs.addPropertyChangeListener(e -> {
+        App.cityEngine.pcs.addPropertyChangeListener(e -> {
             if ("map".equals(e.getPropertyName())) {
                 tileMap.setMap((int[][]) e.getNewValue());
             }
         });
-        cityEngine.changeMap(new int[][] {
+        
+        App.cityEngine.changeMap(new int[][] {
             {5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5},
             {5,4,4,4,4,4,4,4,4,0,4,4,4,4,4,4,4,4,5},
             {5,4,1,1,4,1,1,4,4,0,4,4,1,1,4,1,1,4,5},
