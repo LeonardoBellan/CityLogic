@@ -1,4 +1,6 @@
-package kfclash.citylogic.model;
+package kfclash.citylogic.domain;
+
+import kfclash.citylogic.application.BuildingDescription;
 
 public class BuildingInstance {
     private final BuildingDescription description;

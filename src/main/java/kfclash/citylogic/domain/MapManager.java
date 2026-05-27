@@ -1,11 +1,12 @@
-package kfclash.citylogic.model;
+package kfclash.citylogic.domain;
 
-public class mapManager {
+import kfclash.citylogic.application.BuildingDescription;
+public class MapManager {
     private final Dimension dimensions;
     private final Cell[][] map;
     private final BuildingFactory factory;
 
-    public mapManager(Dimension dimensions, BuildingFactory factory) {
+    public MapManager(Dimension dimensions, BuildingFactory factory) {
         if (dimensions == null) {
             throw new IllegalArgumentException("Dimensions cannot be null");
         }

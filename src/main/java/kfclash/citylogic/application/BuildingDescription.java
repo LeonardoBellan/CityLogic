@@ -1,4 +1,6 @@
-package kfclash.citylogic.model;
+package kfclash.citylogic.application;
+
+import kfclash.citylogic.domain.Dimension;
 
 public class BuildingDescription {
     private final String name;

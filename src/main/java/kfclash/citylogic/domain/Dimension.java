@@ -1,4 +1,4 @@
-package kfclash.citylogic.model;
+package kfclash.citylogic.domain;
 
 public final class Dimension {
     private final int width;

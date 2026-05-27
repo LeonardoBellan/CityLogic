@@ -1,4 +1,4 @@
-package kfclash.citylogic.model;
+package kfclash.citylogic.domain;
 
 public class Cell {
     private final int x;
