@@ -20,7 +20,7 @@ direction TB
         +getAllBuildings() List~IBuildingState~
         +getAdjacentBuildings(id: String, radius: int) List~IBuildingState~
         +isAreaFree(x: int, y: int, footprint: Dimension) boolean
-        +constructBuildingAt(x: int, y: int, typeId: String) IBuildingState
+        +constructBuildingAt(x: int, y: int, desc: BuildingDescription) IBuildingState
         +removeBuildingAt(x: int, y: int) IBuildingState
     }
 
@@ -48,7 +48,7 @@ direction TB
 
     class BuildingFactory {
         <<Factory>>
-        +createBuilding(typeId: String, x: int, y: int) BuildingInstance
+        +createBuilding(description: BuildingDescription, x: int, y: int) BuildingInstance
     }
 
     %% Relations
