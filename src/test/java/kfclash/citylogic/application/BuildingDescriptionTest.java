@@ -1,5 +1,6 @@
 package kfclash.citylogic.application;
 
+import kfclash.citylogic.domain.BuildingDescription;
 import kfclash.citylogic.domain.Dimension;
 import kfclash.citylogic.domain.Resource;
 import org.junit.Test;
@@ -75,8 +76,8 @@ public class BuildingDescriptionTest {
         Dimension footprint = new Dimension(2, 2);
         BuildingDescription desc = new BuildingDescription("Storage", 100, 20, footprint);
 
-        assertNotNull(desc.getId());
-        assertFalse(desc.getId().isBlank());
+        assertNotNull(desc.getTypeId());
+        assertFalse(desc.getTypeId().isBlank());
         assertNotNull(desc.getBaseProduction());
         assertTrue(desc.getBaseProduction().isEmpty());
     }

@@ -1,13 +1,11 @@
 package kfclash.citylogic.domain;
 
-import kfclash.citylogic.application.BuildingDescription;
 import kfclash.citylogic.ports.IBuildingState;
 import kfclash.citylogic.ports.IGridCommandPort;
 import kfclash.citylogic.ports.IGridReadPort;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;

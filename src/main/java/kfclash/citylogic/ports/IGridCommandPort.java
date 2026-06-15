@@ -1,6 +1,6 @@
 package kfclash.citylogic.ports;
 
-import kfclash.citylogic.application.BuildingDescription;
+import kfclash.citylogic.domain.BuildingDescription;
 
 public interface IGridCommandPort {
     IBuildingState constructBuildingAt(int x, int y, BuildingDescription desc);

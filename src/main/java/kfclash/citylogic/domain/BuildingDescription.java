@@ -1,14 +1,10 @@
-package kfclash.citylogic.application;
-
-import kfclash.citylogic.domain.Dimension;
-import kfclash.citylogic.domain.Resource;
+package kfclash.citylogic.domain;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
-public class BuildingDescription {
-    private final String id;
+public final class BuildingDescription {
+    private final String typeId;
     private final String name;
     private final int constructionCost;
     private final int baseMaintenanceCost;
@@ -32,7 +28,7 @@ public class BuildingDescription {
         if (baseProduction == null) {
             throw new IllegalArgumentException("Base production cannot be null");
         }
-        this.id = UUID.randomUUID().toString();
+        this.typeId = normalizeTypeId(name);
         this.name = name;
         this.constructionCost = constructionCost;
         this.baseMaintenanceCost = baseMaintenanceCost;
@@ -40,8 +36,12 @@ public class BuildingDescription {
         this.baseProduction = Collections.unmodifiableList(baseProduction);
     }
 
-    public String getId() {
-        return id;
+    public String getTypeId() {
+        return typeId;
+    }
+
+    private static String normalizeTypeId(String name) {
+        return name.trim().toLowerCase().replaceAll("\\s+", "_");
     }
 
     public String getName() {
@@ -62,5 +62,27 @@ public class BuildingDescription {
 
     public List<Resource> getBaseProduction() {
         return baseProduction;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof BuildingDescription)) {
+            return false;
+        }
+        BuildingDescription other = (BuildingDescription) obj;
+        return typeId.equals(other.typeId);
+    }
+
+    @Override
+    public int hashCode() {
+        return typeId.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "BuildingDescription{" + "typeId='" + typeId + '\'' + ", name='" + name + '\'' + '}';
     }
 }

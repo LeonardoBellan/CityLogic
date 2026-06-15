@@ -46,6 +46,22 @@ direction TB
         +isOccupied() boolean
     }
 
+    class BuildingDescription {
+        <<Flyweight/Metadata>>
+        -typeId: String
+        -name: String
+        -constructionCost: int
+        -baseMaintenanceCost: int
+        -footprint: Dimension
+        -baseProduction: List~Resource~
+        +getTypeId() String
+        +getName() String
+        +getConstructionCost() int
+        +getBaseMaintenanceCost() int
+        +getFootprint() Dimension
+        +getBaseProduction() List~Resource~
+    }
+
     class BuildingFactory {
         <<Factory>>
         +createBuilding(description: BuildingDescription, x: int, y: int) BuildingInstance

@@ -1,6 +1,5 @@
 package kfclash.citylogic.domain;
 
-import kfclash.citylogic.application.BuildingDescription;
 import org.junit.Before;
 import org.junit.Test;
 

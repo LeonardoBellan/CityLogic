@@ -1,6 +1,5 @@
 package kfclash.citylogic.domain;
 
-import kfclash.citylogic.application.BuildingDescription;
 import kfclash.citylogic.ports.IBuildingState;
 
 import java.util.Collections;
@@ -10,8 +9,6 @@ import java.util.UUID;
 public class BuildingInstance implements IBuildingState {
     private final String id;
     private final BuildingDescription description;
-    private final int x;
-    private final int y;
     private final Point position;
     private boolean operationalStatus;
     private final int currentMaintenanceCost;
@@ -22,8 +19,6 @@ public class BuildingInstance implements IBuildingState {
         }
         this.id = UUID.randomUUID().toString();
         this.description = description;
-        this.x = x;
-        this.y = y;
         this.position = new Point(x, y);
         this.operationalStatus = true;
         this.currentMaintenanceCost = description.getBaseMaintenanceCost();
@@ -49,11 +44,11 @@ public class BuildingInstance implements IBuildingState {
     }
 
     public int getX() {
-        return x;
+        return position.getX();
     }
 
     public int getY() {
-        return y;
+        return position.getY();
     }
 
     public Point getPosition() {
@@ -68,7 +63,7 @@ public class BuildingInstance implements IBuildingState {
         return operationalStatus;
     }
 
-    public void setOperational(boolean operationalStatus) {
+    public void setPowered(boolean operationalStatus) {
         this.operationalStatus = operationalStatus;
     }
 

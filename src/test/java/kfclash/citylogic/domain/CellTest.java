@@ -1,7 +1,5 @@
 package kfclash.citylogic.domain;
 
-import kfclash.citylogic.application.BuildingDescription;
-import kfclash.citylogic.domain.Point;
 import org.junit.Before;
 import org.junit.Test;
 

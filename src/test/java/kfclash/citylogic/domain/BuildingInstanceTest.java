@@ -1,6 +1,6 @@
 package kfclash.citylogic.domain;
 
-import kfclash.citylogic.application.BuildingDescription;
+import kfclash.citylogic.domain.BuildingDescription;
 import kfclash.citylogic.domain.Resource;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,16 +43,16 @@ public class BuildingInstanceTest {
 
     @Test
     public void testSetBuildingNotOperational() {
-        building.setOperational(false);
+        building.setPowered(false);
         assertFalse(building.isOperational());
     }
 
     @Test
     public void testSetBuildingOperational() {
-        building.setOperational(false);
+        building.setPowered(false);
         assertFalse(building.isOperational());
 
-        building.setOperational(true);
+        building.setPowered(true);
         assertTrue(building.isOperational());
     }
 
@@ -123,13 +123,13 @@ public class BuildingInstanceTest {
     public void testMultipleOperationalStatusToggles() {
         assertTrue(building.isOperational());
 
-        building.setOperational(false);
+        building.setPowered(false);
         assertFalse(building.isOperational());
 
-        building.setOperational(true);
+        building.setPowered(true);
         assertTrue(building.isOperational());
 
-        building.setOperational(false);
+        building.setPowered(false);
         assertFalse(building.isOperational());
     }
 }

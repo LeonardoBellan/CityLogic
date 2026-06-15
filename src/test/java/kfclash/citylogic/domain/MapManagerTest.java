@@ -1,7 +1,5 @@
 package kfclash.citylogic.domain;
 
-import kfclash.citylogic.application.BuildingDescription;
-import kfclash.citylogic.domain.Dimension;
 import kfclash.citylogic.ports.IBuildingState;
 import org.junit.Before;
 import org.junit.Test;
@@ -206,11 +204,11 @@ public class MapManagerTest {
 
     @Test
     public void testConstructAndRemoveMultipleBuildings() {
-        BuildingInstance building1 = mapManager.constructBuildingAt(0, 0, buildingDescription);
+        mapManager.constructBuildingAt(0, 0, buildingDescription);
         
         Dimension footprint2 = new Dimension(1, 1);
         BuildingDescription desc2 = new BuildingDescription("Small Building", 200, 50, footprint2);
-        BuildingInstance building2 = mapManager.constructBuildingAt(5, 5, desc2);
+        mapManager.constructBuildingAt(5, 5, desc2);
 
         assertTrue(mapManager.getCell(0, 0).isOccupied());
         assertTrue(mapManager.getCell(5, 5).isOccupied());
@@ -231,8 +229,8 @@ public class MapManagerTest {
         Dimension footprint = new Dimension(1, 1);
         BuildingDescription desc = new BuildingDescription("Small", 100, 50, footprint);
 
-        BuildingInstance b1 = smallMap.constructBuildingAt(0, 0, desc);
-        BuildingInstance b2 = smallMap.constructBuildingAt(1, 1, desc);
+        smallMap.constructBuildingAt(0, 0, desc);
+        smallMap.constructBuildingAt(1, 1, desc);
 
         assertEquals(2, smallMap.getDimensions().getWidth());
         assertEquals(2, smallMap.getDimensions().getHeight());
