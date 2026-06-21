@@ -4,7 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 public class CityEngine {
-    public final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     // 0=ROAD  1=BUILDING  2=PARK  3=WATER  4=PAVEMENT  5=HIGHWAY  6=ROOF
     private int[][] map = {{0}};
