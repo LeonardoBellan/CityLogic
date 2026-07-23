@@ -12,8 +12,8 @@ public class BuildingInstance implements IBuildingState {
     private final String id;
     private final BuildingDescription description;
     private final Point position;
-    private boolean operationalStatus;
-    private final int currentMaintenanceCost;
+    private boolean isPowered; 
+    private int currentMaintenanceCost;
 
     public BuildingInstance(BuildingDescription description, int x, int y) {
         if (description == null) {
@@ -22,7 +22,7 @@ public class BuildingInstance implements IBuildingState {
         this.id = UUID.randomUUID().toString();
         this.description = description;
         this.position = new Point(x, y);
-        this.operationalStatus = true;
+        this.isPowered = true;
         this.currentMaintenanceCost = description.getBaseMaintenanceCost();
     }
 
@@ -37,36 +37,31 @@ public class BuildingInstance implements IBuildingState {
     }
 
     @Override
-    public boolean isPowered() {
-        return operationalStatus;
-    }
-
-    public List<Resource> calculateCurrentProduction() {
-        return Collections.unmodifiableList(description.getBaseProduction());
-    }
-
-    public int getX() {
-        return position.getX();
-    }
-
-    public int getY() {
-        return position.getY();
-    }
-
     public Point getPosition() {
         return position;
     }
 
+    @Override
     public BuildingDescription getDescription() {
         return description;
     }
 
-    public boolean isOperational() {
-        return operationalStatus;
+    @Override
+    public boolean isPowered() {
+        return isPowered;
+    }
+    
+    @Override
+    public List<Resource> getCurrentProduction() {
+        if (!isPowered) {
+            // Un edificio spento o non operativo non produce nulla!
+            return Collections.emptyList(); 
+        }
+        return Collections.unmodifiableList(description.getBaseProduction());
     }
 
-    public void setPowered(boolean operationalStatus) {
-        this.operationalStatus = operationalStatus;
+    public void setPowered(boolean powered) {
+        this.isPowered = powered;
     }
 
     public int getCurrentMaintenanceCost() {

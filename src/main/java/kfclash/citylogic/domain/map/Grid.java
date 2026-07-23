@@ -169,8 +169,8 @@ public class Grid implements IGridReadPort, IGridCommandPort {
         // Remove building
         BuildingInstance building = startCell.getBuilding();
         Dimension footprint = building.getDescription().getFootprint();
-        int originX = building.getX();
-        int originY = building.getY();
+        int originX = building.getPosition().getX();
+        int originY = building.getPosition().getY();
 
         for (int offsetX = 0; offsetX < footprint.getWidth(); offsetX++) {
             for (int offsetY = 0; offsetY < footprint.getHeight(); offsetY++) {

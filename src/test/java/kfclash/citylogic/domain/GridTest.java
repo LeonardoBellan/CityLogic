@@ -99,8 +99,8 @@ public class GridTest {
         BuildingInstance building = grid.constructBuildingAt(0, 0, buildingDescription);
 
         assertNotNull(building);
-        assertEquals(0, building.getX());
-        assertEquals(0, building.getY());
+        assertEquals(0, building.getPosition().getX());
+        assertEquals(0, building.getPosition().getY());
         assertEquals(buildingDescription, building.getDescription());
 
         // Verify cells are occupied
@@ -186,8 +186,8 @@ public class GridTest {
         BuildingInstance removed = grid.removeBuildingAt(3, 3);
 
         assertNotNull(removed);
-        assertEquals(3, removed.getX());
-        assertEquals(3, removed.getY());
+        assertEquals(3, removed.getPosition().getX());
+        assertEquals(3, removed.getPosition().getY());
 
         // Verify cells are now empty
         assertFalse(grid.getCell(3, 3).isOccupied());
