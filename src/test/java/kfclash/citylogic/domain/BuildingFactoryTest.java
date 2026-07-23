@@ -28,8 +28,8 @@ public class BuildingFactoryTest {
 
         assertNotNull(building);
         assertEquals(description, building.getDescription());
-        assertEquals(5, building.getX());
-        assertEquals(10, building.getY());
+        assertEquals(5, building.getPosition().getX());
+        assertEquals(10, building.getPosition().getY());
     }
 
     @Test
@@ -37,10 +37,10 @@ public class BuildingFactoryTest {
         BuildingInstance building1 = factory.createBuilding(description, 0, 0);
         BuildingInstance building2 = factory.createBuilding(description, 100, 100);
 
-        assertEquals(0, building1.getX());
-        assertEquals(0, building1.getY());
-        assertEquals(100, building2.getX());
-        assertEquals(100, building2.getY());
+        assertEquals(0, building1.getPosition().getX());
+        assertEquals(0, building1.getPosition().getY());
+        assertEquals(100, building2.getPosition().getX());
+        assertEquals(100, building2.getPosition().getY());
     }
 
     @Test
@@ -59,9 +59,9 @@ public class BuildingFactoryTest {
     }
 
     @Test
-    public void testCreateBuildingIsOperationalByDefault() {
+    public void testCreateBuildingIsPoweredByDefault() {
         BuildingInstance building = factory.createBuilding(description, 0, 0);
-        assertTrue(building.isOperational());
+        assertTrue(building.isPowered());
     }
 
     @Test(expected = IllegalArgumentException.class)
