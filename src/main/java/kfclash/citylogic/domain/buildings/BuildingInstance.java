@@ -1,5 +1,7 @@
-package kfclash.citylogic.domain;
+package kfclash.citylogic.domain.buildings;
 
+import kfclash.citylogic.domain.map.Point;
+import kfclash.citylogic.domain.map.Resource;
 import kfclash.citylogic.ports.IBuildingState;
 
 import java.util.Collections;

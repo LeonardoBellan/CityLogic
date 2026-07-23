@@ -2,6 +2,8 @@ package kfclash.citylogic.domain;
 
 import org.junit.Test;
 
+import kfclash.citylogic.domain.map.Dimension;
+
 import static org.junit.Assert.*;
 
 public class DimensionTest {

@@ -1,12 +1,12 @@
 package kfclash.citylogic.application;
 
-import kfclash.citylogic.domain.BuildingDescription;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import kfclash.citylogic.domain.buildings.BuildingDescription;
 
 /**
  * A simple flyweight catalog for shared BuildingDescription instances.

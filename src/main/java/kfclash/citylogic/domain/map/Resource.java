@@ -1,4 +1,4 @@
-package kfclash.citylogic.domain;
+package kfclash.citylogic.domain.map;
 
 public final class Resource {
     private final String type;

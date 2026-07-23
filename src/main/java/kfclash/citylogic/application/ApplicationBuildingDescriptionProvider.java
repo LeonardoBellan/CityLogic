@@ -1,8 +1,8 @@
 package kfclash.citylogic.application;
 
-import kfclash.citylogic.domain.BuildingDescription;
-import kfclash.citylogic.domain.Dimension;
-import kfclash.citylogic.domain.Resource;
+import kfclash.citylogic.domain.buildings.BuildingDescription;
+import kfclash.citylogic.domain.map.Dimension;
+import kfclash.citylogic.domain.map.Resource;
 
 import java.util.List;
 

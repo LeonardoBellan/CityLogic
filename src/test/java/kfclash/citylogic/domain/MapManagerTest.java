@@ -1,5 +1,11 @@
 package kfclash.citylogic.domain;
 
+import kfclash.citylogic.domain.buildings.BuildingDescription;
+import kfclash.citylogic.domain.buildings.BuildingFactory;
+import kfclash.citylogic.domain.buildings.BuildingInstance;
+import kfclash.citylogic.domain.map.Cell;
+import kfclash.citylogic.domain.map.Dimension;
+import kfclash.citylogic.domain.map.MapManager;
 import kfclash.citylogic.ports.IBuildingState;
 import org.junit.Before;
 import org.junit.Test;

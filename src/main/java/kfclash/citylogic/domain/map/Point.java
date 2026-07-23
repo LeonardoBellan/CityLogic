@@ -1,4 +1,4 @@
-package kfclash.citylogic.domain;
+package kfclash.citylogic.domain.map;
 
 public record Point(int x, int y) {
     public int getX() {

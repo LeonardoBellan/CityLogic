@@ -1,22 +1,27 @@
-package kfclash.citylogic.domain;
+package kfclash.citylogic.domain.map;
 
+import kfclash.citylogic.domain.buildings.BuildingDescription;
+import kfclash.citylogic.domain.buildings.BuildingFactory;
+import kfclash.citylogic.domain.buildings.BuildingInstance;
 import kfclash.citylogic.ports.IBuildingState;
 import kfclash.citylogic.ports.IGridCommandPort;
 import kfclash.citylogic.ports.IGridReadPort;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
-public class MapManager implements IGridReadPort, IGridCommandPort {
+public class Grid implements IGridReadPort, IGridCommandPort {
     private final Dimension dimensions;
     private final Cell[][] map;
     private final BuildingFactory factory;
 
-    public MapManager(Dimension dimensions, BuildingFactory factory) {
+    private final Map<String, BuildingInstance> activeBuildings = new HashMap<>();
+
+    public Grid(Dimension dimensions, BuildingFactory factory) {
         if (dimensions == null) {
             throw new IllegalArgumentException("Dimensions cannot be null");
         }
@@ -55,26 +60,13 @@ public class MapManager implements IGridReadPort, IGridCommandPort {
 
     @Override
     public Optional<IBuildingState> getBuildingById(String id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-        return getAllBuildings().stream()
-                .filter(building -> id.equals(building.getId()))
-                .findFirst();
+        if (id == null) return Optional.empty();
+        return Optional.ofNullable(activeBuildings.get(id));
     }
 
     @Override
     public List<IBuildingState> getAllBuildings() {
-        Set<BuildingInstance> buildingSet = new LinkedHashSet<>();
-        for (int x = 0; x < dimensions.getWidth(); x++) {
-            for (int y = 0; y < dimensions.getHeight(); y++) {
-                Cell cell = map[x][y];
-                if (cell.isOccupied()) {
-                    buildingSet.add(cell.getBuilding());
-                }
-            }
-        }
-        return Collections.unmodifiableList(new ArrayList<>(buildingSet));
+        return List.copyOf(activeBuildings.values());
     }
 
     @Override
@@ -137,6 +129,8 @@ public class MapManager implements IGridReadPort, IGridCommandPort {
 
     @Override
     public BuildingInstance constructBuildingAt(int x, int y, BuildingDescription desc) {
+        
+        // Validate input and spatial placement
         if (desc == null) {
             throw new IllegalArgumentException("BuildingDescription cannot be null");
         }
@@ -144,28 +138,35 @@ public class MapManager implements IGridReadPort, IGridCommandPort {
             throw new IllegalArgumentException("Cannot construct building at the requested position");
         }
 
+
+        // Place building
         BuildingInstance building = factory.createBuilding(desc, x, y);
         Dimension footprint = desc.getFootprint();
+
         for (int offsetX = 0; offsetX < footprint.getWidth(); offsetX++) {
             for (int offsetY = 0; offsetY < footprint.getHeight(); offsetY++) {
                 map[x + offsetX][y + offsetY].setBuilding(building);
             }
         }
-
+        
+        // Add building to active building map
+        activeBuildings.put(building.getId(), building);
         return building;
     }
 
     @Override
     public BuildingInstance removeBuildingAt(int x, int y) {
+
+        // Validate input
         if (!isWithinBounds(x, y)) {
             return null;
         }
-
         Cell startCell = map[x][y];
         if (!startCell.isOccupied()) {
             return null;
         }
 
+        // Remove building
         BuildingInstance building = startCell.getBuilding();
         Dimension footprint = building.getDescription().getFootprint();
         int originX = building.getX();
@@ -184,6 +185,8 @@ public class MapManager implements IGridReadPort, IGridCommandPort {
             }
         }
 
+        // Remove building from active building map
+        activeBuildings.remove(building.getId());
         return building;
     }
 

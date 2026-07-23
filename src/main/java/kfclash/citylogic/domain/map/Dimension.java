@@ -1,4 +1,4 @@
-package kfclash.citylogic.domain;
+package kfclash.citylogic.domain.map;
 
 public final class Dimension {
     private final int width;

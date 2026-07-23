@@ -1,7 +1,10 @@
-package kfclash.citylogic.domain;
+package kfclash.citylogic.domain.buildings;
 
 import java.util.Collections;
 import java.util.List;
+
+import kfclash.citylogic.domain.map.Dimension;
+import kfclash.citylogic.domain.map.Resource;
 
 public final class BuildingDescription {
     private final String typeId;

@@ -3,6 +3,11 @@ package kfclash.citylogic.domain;
 import org.junit.Before;
 import org.junit.Test;
 
+import kfclash.citylogic.domain.buildings.BuildingDescription;
+import kfclash.citylogic.domain.buildings.BuildingFactory;
+import kfclash.citylogic.domain.buildings.BuildingInstance;
+import kfclash.citylogic.domain.map.Dimension;
+
 import static org.junit.Assert.*;
 
 public class BuildingFactoryTest {

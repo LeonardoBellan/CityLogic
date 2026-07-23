@@ -1,8 +1,9 @@
 package kfclash.citylogic.ports;
 
-import kfclash.citylogic.domain.Dimension;
 import java.util.List;
 import java.util.Optional;
+
+import kfclash.citylogic.domain.map.Dimension;
 
 public interface IGridReadPort {
     String getTerrainAt(int x, int y);
