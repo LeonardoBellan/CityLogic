@@ -3,11 +3,15 @@ package kfclash.citylogic.domain;
 public class Cell {
     private final int x;
     private final int y;
+    private final Point position;
+    private int pollutionLevel;
     private BuildingInstance currentBuilding;
 
     public Cell(int x, int y) {
         this.x = x;
         this.y = y;
+        this.position = new Point(x, y);
+        this.pollutionLevel = 0;
     }
 
     public int getX() {
@@ -16,6 +20,18 @@ public class Cell {
 
     public int getY() {
         return y;
+    }
+
+    public Point getPosition() {
+        return position;
+    }
+
+    public int getPollutionLevel() {
+        return pollutionLevel;
+    }
+
+    public void setPollutionLevel(int pollutionLevel) {
+        this.pollutionLevel = pollutionLevel;
     }
 
     public BuildingInstance getBuilding() {

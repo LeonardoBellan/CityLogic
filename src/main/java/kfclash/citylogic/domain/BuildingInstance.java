@@ -1,11 +1,15 @@
 package kfclash.citylogic.domain;
 
-import kfclash.citylogic.application.BuildingDescription;
+import kfclash.citylogic.ports.IBuildingState;
 
-public class BuildingInstance {
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+public class BuildingInstance implements IBuildingState {
+    private final String id;
     private final BuildingDescription description;
-    private final int x;
-    private final int y;
+    private final Point position;
     private boolean operationalStatus;
     private final int currentMaintenanceCost;
 
@@ -13,19 +17,42 @@ public class BuildingInstance {
         if (description == null) {
             throw new IllegalArgumentException("BuildingDescription cannot be null");
         }
+        this.id = UUID.randomUUID().toString();
         this.description = description;
-        this.x = x;
-        this.y = y;
+        this.position = new Point(x, y);
         this.operationalStatus = true;
         this.currentMaintenanceCost = description.getBaseMaintenanceCost();
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getType() {
+        return description.getName();
+    }
+
+    @Override
+    public boolean isPowered() {
+        return operationalStatus;
+    }
+
+    public List<Resource> calculateCurrentProduction() {
+        return Collections.unmodifiableList(description.getBaseProduction());
+    }
+
     public int getX() {
-        return x;
+        return position.getX();
     }
 
     public int getY() {
-        return y;
+        return position.getY();
+    }
+
+    public Point getPosition() {
+        return position;
     }
 
     public BuildingDescription getDescription() {
@@ -36,7 +63,7 @@ public class BuildingInstance {
         return operationalStatus;
     }
 
-    public void setOperational(boolean operationalStatus) {
+    public void setPowered(boolean operationalStatus) {
         this.operationalStatus = operationalStatus;
     }
 

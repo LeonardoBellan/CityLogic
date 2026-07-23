@@ -1,7 +1,17 @@
 package kfclash.citylogic.domain;
 
-import kfclash.citylogic.application.BuildingDescription;
-public class MapManager {
+import kfclash.citylogic.ports.IBuildingState;
+import kfclash.citylogic.ports.IGridCommandPort;
+import kfclash.citylogic.ports.IGridReadPort;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+public class MapManager implements IGridReadPort, IGridCommandPort {
     private final Dimension dimensions;
     private final Cell[][] map;
     private final BuildingFactory factory;
@@ -35,6 +45,73 @@ public class MapManager {
         return map[x][y];
     }
 
+    @Override
+    public String getTerrainAt(int x, int y) {
+        if (!isWithinBounds(x, y)) {
+            return null;
+        }
+        return "land";
+    }
+
+    @Override
+    public Optional<IBuildingState> getBuildingById(String id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+        return getAllBuildings().stream()
+                .filter(building -> id.equals(building.getId()))
+                .findFirst();
+    }
+
+    @Override
+    public List<IBuildingState> getAllBuildings() {
+        Set<BuildingInstance> buildingSet = new LinkedHashSet<>();
+        for (int x = 0; x < dimensions.getWidth(); x++) {
+            for (int y = 0; y < dimensions.getHeight(); y++) {
+                Cell cell = map[x][y];
+                if (cell.isOccupied()) {
+                    buildingSet.add(cell.getBuilding());
+                }
+            }
+        }
+        return Collections.unmodifiableList(new ArrayList<>(buildingSet));
+    }
+
+    @Override
+    public List<IBuildingState> getAdjacentBuildings(String id, int radius) {
+        if (id == null || radius < 0) {
+            return Collections.emptyList();
+        }
+
+        Optional<BuildingInstance> originBuilding = getBuildingInstanceById(id);
+        if (!originBuilding.isPresent()) {
+            return Collections.emptyList();
+        }
+
+        Point origin = originBuilding.get().getPosition();
+        List<IBuildingState> adjacent = new ArrayList<>();
+        for (IBuildingState building : getAllBuildings()) {
+            if (building.getId().equals(id)) {
+                continue;
+            }
+            if (!(building instanceof BuildingInstance)) {
+                continue;
+            }
+            BuildingInstance other = (BuildingInstance) building;
+            int dx = Math.abs(other.getPosition().getX() - origin.getX());
+            int dy = Math.abs(other.getPosition().getY() - origin.getY());
+            if (Math.max(dx, dy) <= radius) {
+                adjacent.add(other);
+            }
+        }
+        return Collections.unmodifiableList(adjacent);
+    }
+
+    @Override
+    public boolean isAreaFree(int x, int y, Dimension footprint) {
+        return validateSpatialPlacement(x, y, footprint);
+    }
+
     public boolean validateSpatialPlacement(int x, int y, Dimension footprint) {
         if (footprint == null) {
             return false;
@@ -58,6 +135,7 @@ public class MapManager {
         return true;
     }
 
+    @Override
     public BuildingInstance constructBuildingAt(int x, int y, BuildingDescription desc) {
         if (desc == null) {
             throw new IllegalArgumentException("BuildingDescription cannot be null");
@@ -77,6 +155,7 @@ public class MapManager {
         return building;
     }
 
+    @Override
     public BuildingInstance removeBuildingAt(int x, int y) {
         if (!isWithinBounds(x, y)) {
             return null;
@@ -106,6 +185,18 @@ public class MapManager {
         }
 
         return building;
+    }
+
+    private Optional<BuildingInstance> getBuildingInstanceById(String id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+        for (IBuildingState buildingState : getAllBuildings()) {
+            if (id.equals(buildingState.getId()) && buildingState instanceof BuildingInstance) {
+                return Optional.of((BuildingInstance) buildingState);
+            }
+        }
+        return Optional.empty();
     }
 
     private boolean isWithinBounds(int x, int y) {
