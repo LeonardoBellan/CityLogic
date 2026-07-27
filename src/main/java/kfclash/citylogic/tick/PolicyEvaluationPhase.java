@@ -1,15 +1,16 @@
-package it.unipd.citylogic.core.tick;
-
-import it.unipd.citylogic.core.domain.CitySnapshot;
-import it.unipd.citylogic.core.domain.ResourceDelta;
-import it.unipd.citylogic.core.policy.IPolicyStrategy;
-import it.unipd.citylogic.core.ports.IBuildingState;
-import it.unipd.citylogic.core.ports.IGridReadPort;
+package kfclash.citylogic.tick;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import kfclash.citylogic.domain.core.CitySnapshot;
+import kfclash.citylogic.domain.core.ResourceDelta;
+import kfclash.citylogic.ports.IBuildingState;
+import kfclash.citylogic.ports.IGridReadPort;
+import kfclash.citylogic.ports.IPolicyStrategy;
+import kfclash.citylogic.ports.ITickPhase;
 
 /**
  * Fase di valutazione delle politiche: applica tutte le ordinanze attive

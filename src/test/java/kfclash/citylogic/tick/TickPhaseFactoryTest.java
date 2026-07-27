@@ -1,7 +1,9 @@
-package it.unipd.citylogic.core.tick;
+package kfclash.citylogic.tick;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import kfclash.citylogic.ports.ITickPhase;
 
 import java.util.List;
 

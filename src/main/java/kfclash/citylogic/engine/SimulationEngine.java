@@ -1,19 +1,19 @@
-package it.unipd.citylogic.core.engine;
-
-import it.unipd.citylogic.core.domain.CityAggregate;
-import it.unipd.citylogic.core.domain.CitySnapshot;
-import it.unipd.citylogic.core.domain.ResourceDelta;
-import it.unipd.citylogic.core.domain.SimulationException;
-import it.unipd.citylogic.core.policy.IPolicyStrategy;
-import it.unipd.citylogic.core.ports.ICityEventPublisher;
-import it.unipd.citylogic.core.ports.IGridReadPort;
-import it.unipd.citylogic.core.tick.ITickPhase;
-import it.unipd.citylogic.core.tick.PolicyEvaluationPhase;
-import it.unipd.citylogic.core.tick.SimulationConfig;
-import it.unipd.citylogic.core.tick.TickPhaseFactory;
+package kfclash.citylogic.engine;
 
 import java.util.List;
 import java.util.Objects;
+
+import kfclash.citylogic.domain.core.CityAggregate;
+import kfclash.citylogic.domain.core.CitySnapshot;
+import kfclash.citylogic.domain.core.ResourceDelta;
+import kfclash.citylogic.domain.core.SimulationException;
+import kfclash.citylogic.ports.ICityEventPublisher;
+import kfclash.citylogic.ports.IGridReadPort;
+import kfclash.citylogic.ports.IPolicyStrategy;
+import kfclash.citylogic.ports.ITickPhase;
+import kfclash.citylogic.tick.PolicyEvaluationPhase;
+import kfclash.citylogic.tick.SimulationConfig;
+import kfclash.citylogic.tick.TickPhaseFactory;
 
 /**
  * Facade del Core (pattern GoF Facade): l'unico punto d'ingresso con cui il

@@ -1,8 +1,10 @@
-package it.unipd.citylogic.core.tick;
+package kfclash.citylogic.tick;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import kfclash.citylogic.ports.ITickPhase;
 
 /**
  * Factory (pattern GoF Factory, requisito d'esame): costruisce la pipeline

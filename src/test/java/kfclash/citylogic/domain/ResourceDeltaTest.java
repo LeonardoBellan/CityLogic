@@ -1,7 +1,9 @@
-package it.unipd.citylogic.core.domain;
+package kfclash.citylogic.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import kfclash.citylogic.domain.core.ResourceDelta;
 
 import java.math.BigDecimal;
 

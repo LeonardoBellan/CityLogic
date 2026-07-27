@@ -1,4 +1,4 @@
-package it.unipd.citylogic.core.domain;
+package kfclash.citylogic.domain.core;
 
 import java.math.BigDecimal;
 import java.util.Objects;

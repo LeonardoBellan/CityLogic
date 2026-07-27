@@ -1,6 +1,6 @@
-package it.unipd.citylogic.core.ports;
+package kfclash.citylogic.ports;
 
-import it.unipd.citylogic.core.domain.CitySnapshot;
+import kfclash.citylogic.domain.core.CitySnapshot;
 
 /**
  * Observer (pattern GoF Observer): chi implementa questa interfaccia viene

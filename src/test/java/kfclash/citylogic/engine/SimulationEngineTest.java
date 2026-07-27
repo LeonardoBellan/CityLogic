@@ -1,26 +1,30 @@
-package it.unipd.citylogic.core.engine;
+package kfclash.citylogic.engine;
 
-import it.unipd.citylogic.core.domain.CityAggregate;
-import it.unipd.citylogic.core.domain.CitySnapshot;
-import it.unipd.citylogic.core.domain.ResourceDelta;
-import it.unipd.citylogic.core.domain.SimulationException;
-import it.unipd.citylogic.core.policy.IPolicyStrategy;
-import it.unipd.citylogic.core.ports.IBuildingState;
-import it.unipd.citylogic.core.ports.ICityEventPublisher;
-import it.unipd.citylogic.core.ports.ICityObserver;
-import it.unipd.citylogic.core.ports.IGridReadPort;
-import it.unipd.citylogic.core.testutil.FakeGridReadPort;
-import it.unipd.citylogic.core.tick.SimulationConfig;
-import it.unipd.citylogic.core.tick.TickPhaseFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import kfclash.citylogic.domain.core.CityAggregate;
+import kfclash.citylogic.domain.core.CitySnapshot;
+import kfclash.citylogic.domain.core.ResourceDelta;
+import kfclash.citylogic.domain.core.SimulationException;
+import kfclash.citylogic.ports.IBuildingState;
+import kfclash.citylogic.ports.ICityEventPublisher;
+import kfclash.citylogic.ports.ICityObserver;
+import kfclash.citylogic.ports.IGridReadPort;
+import kfclash.citylogic.ports.IPolicyStrategy;
+import kfclash.citylogic.testutil.FakeGridReadPort;
+import kfclash.citylogic.tick.SimulationConfig;
+import kfclash.citylogic.tick.TickPhaseFactory;
 
 /**
  * Test di integrazione del {@link SimulationEngine}: verifica il flusso

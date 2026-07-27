@@ -1,12 +1,12 @@
-package it.unipd.citylogic.core.testutil;
-
-import it.unipd.citylogic.core.domain.ResourceDelta;
-import it.unipd.citylogic.core.ports.IBuildingState;
-import it.unipd.citylogic.core.ports.IGridReadPort;
+package kfclash.citylogic.testutil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import kfclash.citylogic.domain.core.ResourceDelta;
+import kfclash.citylogic.ports.IBuildingState;
+import kfclash.citylogic.ports.IGridReadPort;
 
 /**
  * Stub in memoria di {@link IGridReadPort} per i test del Core.

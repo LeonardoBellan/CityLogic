@@ -1,8 +1,7 @@
-package it.unipd.citylogic.core.tick;
+package kfclash.citylogic.ports;
 
-import it.unipd.citylogic.core.domain.CitySnapshot;
-import it.unipd.citylogic.core.domain.ResourceDelta;
-import it.unipd.citylogic.core.ports.IGridReadPort;
+import kfclash.citylogic.domain.core.CitySnapshot;
+import kfclash.citylogic.domain.core.ResourceDelta;
 
 /**
  * Strategy: una fase della pipeline di simulazione eseguita a ogni tick.

@@ -1,8 +1,6 @@
-package it.unipd.citylogic.core.policy;
+package kfclash.citylogic.ports;
 
-import it.unipd.citylogic.core.domain.ResourceDelta;
-import it.unipd.citylogic.core.ports.IBuildingState;
-import it.unipd.citylogic.core.ports.IGridReadPort;
+import kfclash.citylogic.domain.core.ResourceDelta;
 
 /**
  * Strategy (pattern GoF Strategy, requisito d'esame): un'ordinanza

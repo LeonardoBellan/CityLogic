@@ -1,4 +1,4 @@
-package it.unipd.citylogic.core.tick;
+package kfclash.citylogic.tick;
 
 import java.util.List;
 import java.util.Objects;

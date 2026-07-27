@@ -1,15 +1,16 @@
-package it.unipd.citylogic.core.tick;
+package kfclash.citylogic.tick;
 
-import it.unipd.citylogic.core.domain.CitySnapshot;
-import it.unipd.citylogic.core.domain.ResourceDelta;
-import it.unipd.citylogic.core.testutil.FakeGridReadPort;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-
-import static org.junit.jupiter.api.Assertions.*;
+import kfclash.citylogic.domain.core.CitySnapshot;
+import kfclash.citylogic.domain.core.ResourceDelta;
+import kfclash.citylogic.testutil.FakeGridReadPort;
 
 /**
  * Unit test per {@link ProductionPhase}, eseguiti contro lo stub

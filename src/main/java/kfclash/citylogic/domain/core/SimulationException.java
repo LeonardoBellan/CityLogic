@@ -1,4 +1,4 @@
-package it.unipd.citylogic.core.domain;
+package kfclash.citylogic.domain.core;
 
 /**
  * Eccezione di business sollevata dal {@code SimulationEngine} quando un

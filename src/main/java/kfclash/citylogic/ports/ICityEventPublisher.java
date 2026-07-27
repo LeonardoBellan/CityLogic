@@ -1,6 +1,6 @@
-package it.unipd.citylogic.core.ports;
+package kfclash.citylogic.ports;
 
-import it.unipd.citylogic.core.domain.CitySnapshot;
+import kfclash.citylogic.domain.core.CitySnapshot;
 
 /**
  * Port (Output Port) e Subject del pattern Observer: il canale con cui il
