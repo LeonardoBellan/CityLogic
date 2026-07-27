@@ -1,16 +1,15 @@
 package kfclash.citylogic.application;
 
-import kfclash.citylogic.domain.buildings.BuildingDescription;
-import kfclash.citylogic.domain.map.Dimension;
-import kfclash.citylogic.domain.map.Resource;
+import java.math.BigDecimal;
 
-import java.util.List;
+import kfclash.citylogic.domain.buildings.BuildingDescription;
+import kfclash.citylogic.domain.core.ResourceDelta;
+import kfclash.citylogic.domain.map.Dimension;
 
 /**
- * Registers a set of standard BuildingDescription instances into the BuildingCatalog.
- * This class triggers registration via its static initializer; call explicitly from
- * application startup if you prefer explicit control.
- */
+ 
+Registers a set of standard BuildingDescription instances into the
+BuildingCatalog.*/
 public final class ApplicationBuildingDescriptionProvider {
     static {
         initDefaultCatalog();
@@ -19,16 +18,33 @@ public final class ApplicationBuildingDescriptionProvider {
     public static void initDefaultCatalog() {
         BuildingCatalog catalog = BuildingCatalog.getInstance();
 
-        BuildingDescription house = new BuildingDescription("House", 100, 1, new Dimension(1, 1),
-                List.of(new Resource("population", 4)));
+        // House: Impatta esclusivamente la popolazione (incremento di +4)
+        BuildingDescription house = new BuildingDescription(
+                "House", 
+                100, 
+                1, 
+                new Dimension(1, 1),
+                new ResourceDelta(BigDecimal.ZERO, 0.0, 4, 0.0) 
+        );
         catalog.register(house);
 
-        BuildingDescription factory = new BuildingDescription("Factory", 1000, 5, new Dimension(2, 2),
-                List.of(new Resource("goods", 10)));
+        BuildingDescription factory = new BuildingDescription(
+                "Factory", 
+                1000, 
+                5, 
+                new Dimension(2, 2),
+                new ResourceDelta(new BigDecimal("150.00"), 10.0, 0, 0.0) 
+        );
         catalog.register(factory);
 
-        BuildingDescription park = new BuildingDescription("Park", 150, 0, new Dimension(1, 1),
-                List.of(new Resource("happiness", 2)));
+        // Park: Impatta esclusivamente la felicità della città
+        BuildingDescription park = new BuildingDescription(
+                "Park", 
+                150, 
+                0, 
+                new Dimension(1, 1),
+                new ResourceDelta(BigDecimal.ZERO, 0.0, 0, 2.0) 
+        );
         catalog.register(park);
     }
 

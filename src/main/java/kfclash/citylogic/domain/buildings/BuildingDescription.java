@@ -1,10 +1,7 @@
 package kfclash.citylogic.domain.buildings;
 
-import java.util.Collections;
-import java.util.List;
-
+import kfclash.citylogic.domain.core.ResourceDelta;
 import kfclash.citylogic.domain.map.Dimension;
-import kfclash.citylogic.domain.map.Resource;
 
 public final class BuildingDescription {
     private final String typeId;
@@ -12,13 +9,13 @@ public final class BuildingDescription {
     private final int constructionCost;
     private final int baseMaintenanceCost;
     private final Dimension footprint;
-    private final List<Resource> baseProduction;
+    private final ResourceDelta baseProduction;
 
     public BuildingDescription(String name, int constructionCost, int baseMaintenanceCost, Dimension footprint) {
-        this(name, constructionCost, baseMaintenanceCost, footprint, Collections.emptyList());
+        this(name, constructionCost, baseMaintenanceCost, footprint, ResourceDelta.zero());
     }
 
-    public BuildingDescription(String name, int constructionCost, int baseMaintenanceCost, Dimension footprint, List<Resource> baseProduction) {
+    public BuildingDescription(String name, int constructionCost, int baseMaintenanceCost, Dimension footprint, ResourceDelta baseProduction) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("BuildingDescription name cannot be null or blank");
         }
@@ -36,7 +33,7 @@ public final class BuildingDescription {
         this.constructionCost = constructionCost;
         this.baseMaintenanceCost = baseMaintenanceCost;
         this.footprint = footprint;
-        this.baseProduction = Collections.unmodifiableList(baseProduction);
+        this.baseProduction = baseProduction;
     }
 
     public String getTypeId() {
@@ -63,7 +60,7 @@ public final class BuildingDescription {
         return footprint;
     }
 
-    public List<Resource> getBaseProduction() {
+    public ResourceDelta getBaseProduction() {
         return baseProduction;
     }
 
