@@ -1,11 +1,9 @@
 package kfclash.citylogic.domain.buildings;
 
+import kfclash.citylogic.domain.core.ResourceDelta;
 import kfclash.citylogic.domain.map.Point;
-import kfclash.citylogic.domain.map.Resource;
 import kfclash.citylogic.ports.IBuildingState;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 public class BuildingInstance implements IBuildingState {
@@ -52,12 +50,12 @@ public class BuildingInstance implements IBuildingState {
     }
     
     @Override
-    public List<Resource> getCurrentProduction() {
+    public ResourceDelta getCurrentProduction() {
         if (!isPowered) {
             // Un edificio spento o non operativo non produce nulla!
-            return Collections.emptyList(); 
+            return ResourceDelta.zero(); 
         }
-        return Collections.unmodifiableList(description.getBaseProduction());
+        return description.getBaseProduction();
     }
 
     public void setPowered(boolean powered) {
