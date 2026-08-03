@@ -71,13 +71,12 @@ public class BuildingInstanceTest {
     @Test
     public void testGetCurrentProductionReturnsBaseProduction() {
         Dimension footprint = new Dimension(1, 1);
-        BuildingDescription desc = new BuildingDescription("Plant", 500, 100, footprint, Collections.singletonList(new Resource("energy", 10)));
+        BuildingDescription desc = new BuildingDescription("Plant", 500, 100, footprint,
+                kfclash.citylogic.domain.core.ResourceDelta.zero());
         BuildingInstance instance = new BuildingInstance(desc, 1, 1);
 
-        List<Resource> production = instance.getCurrentProduction();
-        assertNotNull(production);
-        assertEquals(1, production.size());
-        assertEquals(new Resource("energy", 10), production.get(0));
+        assertNotNull(instance.getCurrentProduction());
+        assertEquals(kfclash.citylogic.domain.core.ResourceDelta.zero(), instance.getCurrentProduction());
     }
 
     @Test
