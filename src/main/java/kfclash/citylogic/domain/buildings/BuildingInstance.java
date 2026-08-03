@@ -1,10 +1,10 @@
 package kfclash.citylogic.domain.buildings;
 
+import java.util.UUID;
+
 import kfclash.citylogic.domain.core.ResourceDelta;
 import kfclash.citylogic.domain.map.Point;
 import kfclash.citylogic.ports.IBuildingState;
-
-import java.util.UUID;
 
 public class BuildingInstance implements IBuildingState {
     private final String id;
@@ -49,6 +49,11 @@ public class BuildingInstance implements IBuildingState {
         return isPowered;
     }
     
+    @Override
+    public ResourceDelta getBaseProduction() {
+        return description.getBaseProduction();
+    }
+
     @Override
     public ResourceDelta getCurrentProduction() {
         if (!isPowered) {

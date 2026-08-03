@@ -203,6 +203,19 @@ public class GridTest {
     }
 
     @Test
+    public void testRemoveBuildingAtRemovesItFromLookupAndCellState() {
+        BuildingInstance building = grid.constructBuildingAt(3, 3, buildingDescription);
+
+        BuildingInstance removed = grid.removeBuildingAt(3, 3);
+
+        assertNotNull(removed);
+        assertFalse(grid.getBuildingById(building.getId()).isPresent());
+        assertTrue(grid.getAllBuildings().isEmpty());
+        assertNull(grid.getCell(3, 3).getBuilding());
+        assertFalse(grid.getCell(3, 3).isOccupied());
+    }
+
+    @Test
     public void testRemoveBuildingAtOutOfBounds() {
         BuildingInstance removed = grid.removeBuildingAt(15, 15);
         assertNull(removed);

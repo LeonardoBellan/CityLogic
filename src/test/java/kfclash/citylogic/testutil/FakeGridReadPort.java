@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import kfclash.citylogic.domain.core.ResourceDelta;
+import kfclash.citylogic.domain.map.Dimension;
+import kfclash.citylogic.domain.map.Point;
 import kfclash.citylogic.ports.IBuildingState;
 import kfclash.citylogic.ports.IGridReadPort;
 
@@ -51,6 +53,21 @@ public class FakeGridReadPort implements IGridReadPort {
         public ResourceDelta getBaseProduction() {
             return baseProduction;
         }
+
+        @Override
+        public ResourceDelta getCurrentProduction() {
+            return baseProduction;
+        }
+
+        @Override
+        public Point getPosition() {
+            return new Point(x, y);
+        }
+
+        @Override
+        public kfclash.citylogic.domain.buildings.BuildingDescription getDescription() {
+            return null;
+        }
     }
 
     private final List<FakeBuilding> buildings = new ArrayList<>();
@@ -77,6 +94,16 @@ public class FakeGridReadPort implements IGridReadPort {
     @Override
     public List<IBuildingState> getAllBuildings() {
         return new ArrayList<>(buildings);
+    }
+
+    @Override
+    public String getTerrainAt(int x, int y) {
+        return "land";
+    }
+
+    @Override
+    public boolean isAreaFree(int x, int y, Dimension footprint) {
+        return true;
     }
 
     @Override

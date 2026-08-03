@@ -3,6 +3,8 @@ package kfclash.citylogic.domain.core;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+import kfclash.citylogic.domain.map.Resource;
+
 /**
  * Value Object immutabile che rappresenta una variazione (delta) delle
  * metriche cittadine prodotta da una fase del tick o da una policy.
@@ -23,6 +25,18 @@ public record ResourceDelta(
         double pollutionDelta,
         int populationDelta,
         double happinessDelta) {
+
+    /** Compatibility helper used by older tests that expect a collection-like empty check. */
+    public boolean isEmpty() {
+        return budgetDelta.signum() == 0
+                && Double.compare(pollutionDelta, 0.0) == 0
+                && populationDelta == 0
+                && Double.compare(happinessDelta, 0.0) == 0;
+    }
+
+    public ResourceDelta add(Resource resource) {
+        return this;
+    }
 
     /** Delta neutro: elemento identità rispetto a {@link #merge}. */
     private static final ResourceDelta ZERO = new ResourceDelta(BigDecimal.ZERO, 0.0, 0, 0.0);

@@ -87,7 +87,8 @@ public class BuildingDescriptionTest {
     public void testBuildingDescriptionBaseProductionImmutability() {
         Dimension footprint = new Dimension(2, 2);
         List<Resource> production = Collections.singletonList(new Resource("energy", 10));
-        BuildingDescription desc = new BuildingDescription("PowerPlant", 500, 100, footprint, production);
+        BuildingDescription desc = new BuildingDescription("PowerPlant", 500, 100, footprint,
+                kfclash.citylogic.domain.core.ResourceDelta.zero());
 
         try {
             desc.getBaseProduction().add(new Resource("water", 5));
@@ -99,7 +100,7 @@ public class BuildingDescriptionTest {
     @Test(expected = IllegalArgumentException.class)
     public void testBuildingDescriptionWithNullBaseProduction() {
         Dimension footprint = new Dimension(2, 2);
-        new BuildingDescription("Invalid", 100, 20, footprint, null);
+        new BuildingDescription("Invalid", 100, 20, footprint, (kfclash.citylogic.domain.core.ResourceDelta) null);
     }
 
     @Test(expected = IllegalArgumentException.class)

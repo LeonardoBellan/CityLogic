@@ -10,5 +10,6 @@ public interface IBuildingState {
     boolean isPowered();
     Point getPosition(); 
     BuildingDescription getDescription();
+    ResourceDelta getBaseProduction();
     ResourceDelta getCurrentProduction();
 }
