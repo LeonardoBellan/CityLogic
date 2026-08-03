@@ -1,308 +1,265 @@
 ## Domain model
 
+The current implementation is organized around a more concrete, domain-driven structure than the original abstract UML. The sections below reflect what is actually present in the codebase.
+
+## Current architecture overview
+
+- Map and buildings: Grid, Cell, BuildingDescription, BuildingInstance, BuildingFactory, BuildingCatalog
+- Simulation: SimulationEngine, CityAggregate, CitySnapshot, ResourceDelta, ProductionPhase, PolicyEvaluationPhase
+- Application facade: GameEngine
+- Ports: IGridReadPort, IGridCommandPort, IBuildingState, ICityEventPublisher, IPolicyStrategy
+
+## Map module: current implementation
+
 ```mermaid
-%%{init: {
-  'theme': 'base',
-  'themeVariables': {
-    'primaryColor': '#f9f9f9',
-    'strokeColor': '#333333',
-    'lineColor': '#555555',
-    'fontSize': '13px',
-  },
-  'config': { 'layout': 'orthogonal' }
-}}%%
 classDiagram
     direction TB
 
-    class Player
-
-    class Resource {
-        type
-        amount
-    }
-
-    %% Map
-    class Cell {
-        position
-        isOccupied
-        pollutionLevel
-        activeBonus
-    }
-
     class Grid {
-        width
-        height
+        -dimensions: Dimension
+        -map: Cell[][]
+        -activeBuildings: Map<String, BuildingInstance>
+        -factory: BuildingFactory
+        +getTerrainAt(x, y)
+        +getBuildingById(id)
+        +getAllBuildings()
+        +getAdjacentBuildings(id, radius)
+        +isAreaFree(x, y, footprint)
+        +constructBuildingAt(x, y, desc)
+        +removeBuildingAt(x, y)
     }
 
-    %% Buildings
+    class Cell {
+        -position: Point
+        -pollutionLevel: int
+        -currentBuilding: BuildingInstance
+        +setBuilding(building)
+        +clear()
+        +getBuilding()
+        +isOccupied()
+    }
+
     class BuildingInstance {
-        position
-        operationalStatus
-        currentMaintenanceCost
+        -id: String
+        -description: BuildingDescription
+        -position: Point
+        -isPowered: boolean
+        -currentMaintenanceCost: int
+        +getBaseProduction()
+        +getCurrentProduction()
     }
 
     class BuildingDescription {
-        name
-        constructionCost
-        baseMaintenanceCost
-        footprint
-        effectRadius
+        -typeId: String
+        -name: String
+        -constructionCost: int
+        -baseMaintenanceCost: int
+        -footprint: Dimension
+        -baseProduction: ResourceDelta
     }
 
-    class EnvironmentalEffect {
-        type
-        intensity
-        radius
+    class BuildingFactory {
+        +createBuilding(description, x, y)
     }
 
+    class BuildingCatalog {
+        +intern(description)
+        +getByTypeId(typeId)
+    }
 
-    %% %%
-    Player "1" -- "1" Grid : manages
-    Player "1" -- "*" Resource : owns/accumulates
-    Player "1" -- "*" BuildingInstance : builds/demolishes
-    Grid "1" *-- "400" Cell : consists of
-
-    Cell "0..1" --> "1" BuildingInstance : hosts
-    BuildingInstance "*" -- "1" BuildingDescription : based on (Immutable Metadata)
-    BuildingInstance ..> Resource : produces
-    BuildingInstance o-- EnvironmentalEffect : generates
-    EnvironmentalEffect "*" -- "*" Cell : affects
+    Grid *-- Cell : contains
+    Grid --> BuildingFactory : uses
+    Grid --> BuildingCatalog : via factory
+    Cell --> BuildingInstance : hosts
+    BuildingInstance --> BuildingDescription : uses
+    BuildingFactory --> BuildingInstance : creates
 ```
 
-## System Sequence Diagram
+### Where the implementation is better
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Player
-    participant System as :System
+- The implementation is stronger on actual gameplay rules: placement validation, cell occupation, demolition logic, and building footprint handling are all enforced in the grid layer.
+- The use of BuildingCatalog as a flyweight registry makes building metadata sharing explicit and more robust than a purely conceptual diagram.
 
-    Note over Player, System: Construction Process
-    Player->>System: selectBuilding(buildingType)
-    System-->>Player: showPreview(buildingDetails)
+### Where the older diagram is better
 
-    loop During Drag/Hover
-        Player->>System: updatePosition(x,y)
-        System-->>Player: showPlacementValidity(isValid)
-    end
+- The original diagram is still clearer for high-level communication because it shows the intended conceptual roles of map manager and building metadata more simply.
+- It is also better as a planning artifact for the group because it communicates responsibilities at a higher level.
 
-    Player->>System: confirmPlacement(x,y)
-    opt Placement is valid
-        System-->>Player: updateMap(), deductBudget(), applyAreaEffects()
-    end
-
-    Note over Player, System: Resource Management & Lifecycle
-    Note right of System: System internally processes simulation tick
-
-    System-->>Player: updateResources(power, water, taxes)
-
-    alt Insufficient resources for building
-        System-->>Player: signalInactiveBuilding(position)
-    else Resources restored
-        System-->>Player: signalActiveBuilding(position)
-    end
-
-    Note over Player, System: Demolition Process
-    Player->>System: toggleDemolitionTool(active)
-    System-->>Player: updateCursorIcon(Demolition)
-
-    Player->>System: clickCell(x,y)
-    alt Cell occupied by building
-        System-->>Player: removeBuilding(), ceaseEffects()
-    else Cell empty
-        System-->>Player: feedbackError("No building to demolish")
-    end
-
-    Player->>System: deactivateDemolitionTool()
-    System-->>Player: restoreStandardCursor()
-```
-
-# Design class diagram
+## Simulation module: current implementation
 
 ```mermaid
 classDiagram
     direction TB
 
-    %% ==========================================
-    %% 1. ENUMERATIONS AND BASE DATA STRUCTURES
-    %% ==========================================
-    class ToolType {
-        <<enumeration>>
-        NONE
-        PLACEMENT
-        DEMOLITION
+    class SimulationEngine {
+        -cityState: CityAggregate
+        -phases: List<ITickPhase>
+        -gridReader: IGridReadPort
+        -eventPublisher: ICityEventPublisher
+        +advanceTick()
+        +activatePolicy(policy)
+        +deactivatePolicy(name)
+        +getActivePolicyNames()
     }
 
-    class Dimension {
-        <<struct>>
-        +width: int
-        +height: int
+    class CityAggregate {
+        -budget: BigDecimal
+        -pollution: double
+        -population: int
+        -happiness: double
+        -tickCount: int
+        +applyDelta(delta)
+        +exportSnapshot()
+        +restoreFromSnapshot(snapshot)
     }
 
-    class Resource {
-        <<value object>>
-        -type: String
-        -amount: int
-        +getType() String
-        +getAmount() int
+    class CitySnapshot {
+        +budget
+        +pollution
+        +population
+        +happiness
+        +tickCount
     }
 
-    class ProductionDisplayDetails {
-        <<DTO - Data Transfer Object>>
-        %% Data sent to the UI to show the preview
-        +isValidPlacement: boolean
-        +baseValue: int
-        +modifierBonus: int
-        +finalValue: int
-        +bonusLabel: String
+    class ResourceDelta {
+        +merge(other)
+        +zero()
     }
 
-    %% ==========================================
-    %% 2. RULES AND ADJACENCY SYSTEM (STRATEGY)
-    %% ==========================================
-    class IPlacementRule {
+    class ITickPhase {
         <<interface>>
-        %% Generic spatial/logical placement rule
-        +isValid(x: int, y: int, map: MapManager) boolean
+        +execute(snapshot, grid)
     }
 
-    class RoadAdjacencyRule {
-        %% Example: "Valid only if there is an adjacent road"
-        +isValid(x: int, y: int, map: MapManager) boolean
+    class ProductionPhase {
+        +execute(snapshot, grid)
     }
 
-    %% ==========================================
-    %% 3. POLICY SYSTEM (OBSERVER) - External Module
-    %% ==========================================
-    class PolicyChangeEvent {
-        -policy: Policy
-        -isActivated: boolean
-        +getPolicy() Policy
-        +isActivated() boolean
+    class PolicyEvaluationPhase {
+        -activePolicies: List<IPolicyStrategy>
+        +execute(snapshot, grid)
     }
 
-    class IPolicyObserver {
+    class IPolicyStrategy {
         <<interface>>
-        +onPolicyChanged(event: PolicyChangeEvent) void
+        +getName()
+        +calculateModifier(building, grid)
     }
 
-    class Policy {
-        <<interface>>
-        +getName() String
-        +appliesTo(description: BuildingDescription) boolean
-        +modifyProduction(building: BuildingInstance, baseResource: Resource) Resource
-    }
+    SimulationEngine --> CityAggregate : mutates
+    SimulationEngine --> ITickPhase : executes
+    SimulationEngine --> IGridReadPort : reads
+    SimulationEngine --> ICityEventPublisher : publishes
+    ITickPhase <|.. ProductionPhase
+    ITickPhase <|.. PolicyEvaluationPhase
+    PolicyEvaluationPhase --> IPolicyStrategy : evaluates
+```
 
-    class GreenSubsidyPolicy {
-        +getName() String
-        +appliesTo(description: BuildingDescription) boolean
-        +modifyProduction(building: BuildingInstance, baseResource: Resource) Resource
-    }
+### Where the implementation is better
 
-    %% ==========================================
-    %% 4. CENTRAL ORCHESTRATION (FACADE & CORE)
-    %% ==========================================
-    class IGameCoreFacade {
-        <<interface>>
-        %% Masks the Core for the Controller: exposes only user input logic
-        +constructBuilding(x: int, y: int, selectedDesc: BuildingDescription) boolean
-        +demolishBuilding(x: int, y: int) boolean
-        +getBuildingDescriptionById(description_id: String) BuildingDescription
-        +getBuildingPreviewDetails(x: int, y: int, desc: BuildingDescription) ProductionDisplayDetails
-    }
+- The implementation is stronger on runtime correctness: the tick is transactional, uses snapshots, and can roll back when invariants are violated.
+- The phase-based pipeline is easier to test and evolve than a single monolithic simulation loop.
+- ResourceDelta is a cleaner representation for aggregating economic and environmental changes than a more loosely typed diagram.
 
-    class GameCore {
-        %% Orchestrator: Coordinates Map, Economy and Policies
-        -mapManager: MapManager
-        -activePolicies: List~Policy~
-        -policyObservers: List~IPolicyObserver~
-        -buildingCatalog: Map~String, BuildingDescription~
+### Where the older diagram is better
 
-        +constructBuilding(x: int, y: int, selectedDesc: BuildingDescription) boolean
-        +demolishBuilding(x: int, y: int) boolean
-        +getBuildingDescriptionById(description_id: String) BuildingDescription
-        +getBuildingPreviewDetails(x: int, y: int, desc: BuildingDescription) ProductionDisplayDetails
+- The older diagram is more expressive if the policy subsystem is later expanded into a richer manager/observer architecture.
+- It is also better for conceptual discussions with non-developers because it highlights the intended policy flow at a higher level.
 
-        %% Internal logic methods and external modules
-        ~registerPolicyObserver(observer: IPolicyObserver) void
-        ~unregisterPolicyObserver(observer: IPolicyObserver) void
-        ~activatePolicy(policy: Policy) void
-        -notifyPolicyObservers(event: PolicyChangeEvent) void
-        -hasEnoughResources(desc: BuildingDescription) boolean
-        -deductConstructionCosts(desc: BuildingDescription) void
+## Bottom line
+
+For the current project state:
+
+- The map and building implementation is more precise than the earlier diagram.
+- The simulation implementation is more robust and testable than the earlier diagram.
+- The older diagrams are still useful as design intent, but the code should be treated as the authoritative source for the current version of the project.
+
+          +constructBuilding(x: int, y: int, selectedDesc: BuildingDescription) boolean
+          +demolishBuilding(x: int, y: int) boolean
+          +getBuildingDescriptionById(description_id: String) BuildingDescription
+          +getBuildingPreviewDetails(x: int, y: int, desc: BuildingDescription) ProductionDisplayDetails
+
+          %% Internal logic methods and external modules
+          ~registerPolicyObserver(observer: IPolicyObserver) void
+          ~unregisterPolicyObserver(observer: IPolicyObserver) void
+          ~activatePolicy(policy: Policy) void
+          -notifyPolicyObservers(event: PolicyChangeEvent) void
+          -hasEnoughResources(desc: BuildingDescription) boolean
+          -deductConstructionCosts(desc: BuildingDescription) void
+
     }
 
     %% ==========================================
     %% 5. USER INTERFACE (CONTROLLER)
     %% ==========================================
     class MapController {
-        %% Middleman: converts UI input into GameCore calls
-        -gameCore: IGameCoreFacade
-        -currentTool: ToolType
-        -selectedBuildingDesc: BuildingDescription
-        +clickCell(x: int, y: int) void
-        +hoverCell(x: int, y: int) void
-        +selectBuildingForPlacement(description_id: String) void
-        +toggleDemolitionTool(active: boolean) void
+    %% Middleman: converts UI input into GameCore calls
+    -gameCore: IGameCoreFacade
+    -currentTool: ToolType
+    -selectedBuildingDesc: BuildingDescription
+    +clickCell(x: int, y: int) void
+    +hoverCell(x: int, y: int) void
+    +selectBuildingForPlacement(description_id: String) void
+    +toggleDemolitionTool(active: boolean) void
     }
 
     %% ==========================================
     %% 6. MAP MANAGEMENT (GEOMETRY AND CELLS)
     %% ==========================================
     class MapManager {
-        %% Spatial Manager: Controls placement and coordinates, ignores economy
-        -dimensions: Dimension
-        -map: Cell[][]
-        -factory: BuildingFactory
-        +getCell(x: int, y: int) Cell
-        +validateSpatialPlacement(x: int, y: int, footprint: Dimension) boolean
-        +constructBuildingAt(x: int, y: int, desc: BuildingDescription) BuildingInstance
-        +removeBuildingAt(x: int, y: int) BuildingInstance
+    %% Spatial Manager: Controls placement and coordinates, ignores economy
+    -dimensions: Dimension
+    -map: Cell[][]
+    -factory: BuildingFactory
+    +getCell(x: int, y: int) Cell
+    +validateSpatialPlacement(x: int, y: int, footprint: Dimension) boolean
+    +constructBuildingAt(x: int, y: int, desc: BuildingDescription) BuildingInstance
+    +removeBuildingAt(x: int, y: int) BuildingInstance
     }
 
     class BuildingFactory {
-        <<simple factory>>
-        +createBuilding(description: BuildingDescription, x: int, y: int) BuildingInstance
+    <<simple factory>>
+    +createBuilding(description: BuildingDescription, x: int, y: int) BuildingInstance
     }
 
     class Cell {
-        %% Base cell of the two-dimensional grid
-        -position: Point
-        -pollutionLevel: int
-        -currentBuilding: BuildingInstance
-        +setBuilding(building: BuildingInstance) void
-        +clear() void
-        +getBuilding() BuildingInstance
-        +isOccupied() boolean
+    %% Base cell of the two-dimensional grid
+    -position: Point
+    -pollutionLevel: int
+    -currentBuilding: BuildingInstance
+    +setBuilding(building: BuildingInstance) void
+    +clear() void
+    +getBuilding() BuildingInstance
+    +isOccupied() boolean
     }
 
     %% ==========================================
     %% 7. GAME ENTITIES (BUILDINGS)
     %% ==========================================
     class BuildingInstance {
-        %% Physical Instance: Building placed on the map
-        -position: Point
-        -operationalStatus: boolean
-        -description: BuildingDescription
-        -activeAppliedPolicies: List~Policy~
-        +onPolicyChanged(event: PolicyChangeEvent) void
-        +calculateCurrentProduction() List~Resource~
-        +getPosition() Point
-        +getDescription() BuildingDescription
+    %% Physical Instance: Building placed on the map
+    -position: Point
+    -operationalStatus: boolean
+    -description: BuildingDescription
+    -activeAppliedPolicies: List~Policy~
+    +onPolicyChanged(event: PolicyChangeEvent) void
+    +calculateCurrentProduction() List~Resource~
+    +getPosition() Point
+    +getDescription() BuildingDescription
     }
 
     class BuildingDescription {
-        <<flyweight / metadata>>
-        %% Immutable Data: Costs, footprint and rules shared among similar instances
-        -name: String
-        -constructionCost: int
-        -footprint: Dimension
-        -baseProduction: List~Resource~
-        -placementRules: List~IPlacementRule~
-        +getFootprint() Dimension
-        +getConstructionCost() int
-        +getBaseProduction() List~Resource~
-        +getPlacementRules() List~IPlacementRule~
+    <<flyweight / metadata>>
+    %% Immutable Data: Costs, footprint and rules shared among similar instances
+    -name: String
+    -constructionCost: int
+    -footprint: Dimension
+    -baseProduction: List~Resource~
+    -placementRules: List~IPlacementRule~
+    +getFootprint() Dimension
+    +getConstructionCost() int
+    +getBaseProduction() List~Resource~
+    +getPlacementRules() List~IPlacementRule~
     }
 
     %% ==========================================
@@ -317,33 +274,36 @@ classDiagram
     MapController ..> ProductionDisplayDetails : reads
 
     %% Core, Catalog and Dimensions
-    GameCore "1" o-- "*" BuildingDescription : contains catalog
-    BuildingDescription *-- Dimension : uses for footprint
-    MapManager *-- Dimension : uses for map size
+    GameCore "1" o-- "_" BuildingDescription : contains catalog
+    BuildingDescription _-- Dimension : uses for footprint
+    MapManager \*-- Dimension : uses for map size
 
     %% Adjacency and Validation Rules
-    BuildingDescription *-- IPlacementRule : defines rules per type
+    BuildingDescription \*-- IPlacementRule : defines rules per type
     IPlacementRule <|.. RoadAdjacencyRule : implements
     IPlacementRule ..> MapManager : analyzes adjacencies on
     GameCore ..> IPlacementRule : executes validation
 
     %% Map Orchestration and Factory
     GameCore --> MapManager : orchestrates
-    MapManager *-- BuildingFactory : owns
-    MapManager *-- Cell : composed of
+    MapManager _-- BuildingFactory : owns
+    MapManager _-- Cell : composed of
     BuildingFactory ..> BuildingInstance : instantiates
     Cell "0..1" --> "1" BuildingInstance : hosts
 
     %% Observer Pattern (Policy)
     IPolicyObserver <|.. BuildingInstance : implements
-    GameCore "1" o-- "*" IPolicyObserver : notifies changes
+    GameCore "1" o-- "\*" IPolicyObserver : notifies changes
     BuildingInstance ..> PolicyChangeEvent : reacts to
     GameCore ..> PolicyChangeEvent : creates event
 
     %% Strategy Pattern and Building Meta-Data
-    BuildingInstance "*" --> "1" BuildingDescription : reads base data from
-    BuildingInstance "0..*" o-- "0..*" Policy : actively applies
+    BuildingInstance "_" --> "1" BuildingDescription : reads base data from
+    BuildingInstance "0.._" o-- "0..\*" Policy : actively applies
     Policy <|.. GreenSubsidyPolicy : implements
     BuildingInstance ..> Resource : generates
     Policy ..> Resource : modifies
+
+```
+
 ```

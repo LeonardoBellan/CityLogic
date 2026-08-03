@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import kfclash.citylogic.ports.IPolicyStrategy;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ class GameEngineTest {
 
     private static class RecordingGrid implements IGridCommandPort, IGridReadPort {
         private final List<String> constructed = new ArrayList<>();
+        private int removals = 0;
 
         @Override
         public IBuildingState constructBuildingAt(int x, int y, BuildingDescription desc) {
@@ -37,6 +40,7 @@ class GameEngineTest {
 
         @Override
         public IBuildingState removeBuildingAt(int x, int y) {
+            removals++;
             return null;
         }
 
@@ -168,5 +172,55 @@ class GameEngineTest {
         engine.advanceTime();
 
         assertEquals(1, simulation.getCurrentSnapshot().tickCount());
+    }
+
+    @Test
+    void demolishBuildingDelegatesToGridAndReturnsTrueWhenRemoved() {
+        RecordingGrid grid = new RecordingGrid();
+        BuildingCatalog catalog = BuildingCatalog.getInstance();
+        CityAggregate city = new CityAggregate(new BigDecimal("1000"), 0, 50.0);
+        SimulationEngine simulation = new SimulationEngine(
+                city,
+                grid,
+                new RecordingPublisher(),
+                new TickPhaseFactory(),
+                SimulationConfig.defaultConfig());
+        GameEngine engine = new GameEngine(grid, grid, simulation, catalog,
+                new PlacementValidator(catalog));
+
+        assertFalse(engine.demolishBuilding(0, 0));
+        assertEquals(1, grid.removals);
+    }
+
+    @Test
+    void policiesAreForwardedToSimulationEngine() {
+        RecordingGrid grid = new RecordingGrid();
+        BuildingCatalog catalog = BuildingCatalog.getInstance();
+        CityAggregate city = new CityAggregate(new BigDecimal("1000"), 0, 50.0);
+        SimulationEngine simulation = new SimulationEngine(
+                city,
+                grid,
+                new RecordingPublisher(),
+                new TickPhaseFactory(),
+                SimulationConfig.defaultConfig());
+        GameEngine engine = new GameEngine(grid, grid, simulation, catalog,
+                new PlacementValidator(catalog));
+
+        IPolicyStrategy policy = new IPolicyStrategy() {
+            @Override
+            public String getName() {
+                return "Test Policy";
+            }
+
+            @Override
+            public kfclash.citylogic.domain.core.ResourceDelta calculateModifier(IBuildingState building, IGridReadPort grid) {
+                return kfclash.citylogic.domain.core.ResourceDelta.zero();
+            }
+        };
+
+        engine.setCityPolicy(policy);
+        engine.clearCityPolicy(policy.getName());
+
+        assertTrue(simulation.getActivePolicyNames().isEmpty());
     }
 }

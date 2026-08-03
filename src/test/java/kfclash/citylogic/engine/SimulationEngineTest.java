@@ -180,6 +180,53 @@ class SimulationEngineTest {
     }
 
     @Test
+    @DisplayName("attivare la stessa politica più volte non duplica gli effetti")
+    void duplicatePolicyActivationIsIgnored() {
+        grid.addBuilding("f1", "INDUSTRIAL", true,
+                new ResourceDelta(new BigDecimal("100"), 0.0, 0, 0.0), 0, 0);
+        IPolicyStrategy policy = new IPolicyStrategy() {
+            @Override
+            public String getName() {
+                return "Tassa";
+            }
+
+            @Override
+            public ResourceDelta calculateModifier(IBuildingState b, IGridReadPort g) {
+                return new ResourceDelta(new BigDecimal("50"), 0.0, 0, 0.0);
+            }
+        };
+
+        engine.activatePolicy(policy);
+        engine.activatePolicy(policy);
+        engine.advanceTick();
+
+        assertEquals(List.of("Tassa"), engine.getActivePolicyNames());
+        assertEquals(0, new BigDecimal("1150").compareTo(engine.getCurrentSnapshot().budget()));
+    }
+
+    @Test
+    @DisplayName("se la pipeline non include la fase policy, attivare una politica fallisce in modo chiaro")
+    void activatingPolicyWithoutPolicyPhaseThrowsHelpfulException() {
+        SimulationEngine engineWithoutPolicyPhase = new SimulationEngine(city, grid, publisher,
+                new TickPhaseFactory(), new SimulationConfig(List.of(TickPhaseFactory.PHASE_PRODUCTION)));
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> engineWithoutPolicyPhase.activatePolicy(new IPolicyStrategy() {
+                    @Override
+                    public String getName() {
+                        return "Tassa";
+                    }
+
+                    @Override
+                    public ResourceDelta calculateModifier(IBuildingState b, IGridReadPort g) {
+                        return ResourceDelta.zero();
+                    }
+                }));
+
+        assertTrue(exception.getMessage().contains("POLICY"));
+    }
+
+    @Test
     @DisplayName("loadState ripristina una partita salvata")
     void loadStateRestoresSavedGame() {
         CitySnapshot saved = new CitySnapshot(

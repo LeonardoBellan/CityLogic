@@ -2,26 +2,24 @@
 classDiagram
 direction TB
 
-    %% External Interfaces (Defined in SharedContracts)
+    %% External interfaces used by the current implementation
     class IGridReadPort { <<interface>> }
     class IGridCommandPort { <<interface>> }
     class IBuildingState { <<interface>> }
 
-    %% ==========================================
-    %% MAP DOMAIN CORE
-    %% ==========================================
-    class MapManager {
+    class Grid {
         <<Domain Service>>
         -dimensions: Dimension
         -map: Cell[][]
+        -activeBuildings: Map<String, BuildingInstance>
         -factory: BuildingFactory
         +getTerrainAt(x: int, y: int) String
         +getBuildingById(id: String) Optional~IBuildingState~
         +getAllBuildings() List~IBuildingState~
         +getAdjacentBuildings(id: String, radius: int) List~IBuildingState~
         +isAreaFree(x: int, y: int, footprint: Dimension) boolean
-        +constructBuildingAt(x: int, y: int, desc: BuildingDescription) IBuildingState
-        +removeBuildingAt(x: int, y: int) IBuildingState
+        +constructBuildingAt(x: int, y: int, desc: BuildingDescription) BuildingInstance
+        +removeBuildingAt(x: int, y: int) BuildingInstance
     }
 
     class BuildingInstance {
@@ -30,10 +28,12 @@ direction TB
         -description: BuildingDescription
         -position: Point
         -isPowered: boolean
+        -currentMaintenanceCost: int
         +getId() String
         +getType() String
         +isPowered() boolean
-        +calculateCurrentProduction() List~Resource~
+        +getBaseProduction() ResourceDelta
+        +getCurrentProduction() ResourceDelta
     }
 
     class Cell {
@@ -53,13 +53,11 @@ direction TB
         -constructionCost: int
         -baseMaintenanceCost: int
         -footprint: Dimension
-        -baseProduction: List~Resource~
+        -baseProduction: ResourceDelta
         +getTypeId() String
         +getName() String
-        +getConstructionCost() int
-        +getBaseMaintenanceCost() int
         +getFootprint() Dimension
-        +getBaseProduction() List~Resource~
+        +getBaseProduction() ResourceDelta
     }
 
     class BuildingFactory {
@@ -67,13 +65,21 @@ direction TB
         +createBuilding(description: BuildingDescription, x: int, y: int) BuildingInstance
     }
 
+    class BuildingCatalog {
+        <<Flyweight Registry>>
+        +intern(description: BuildingDescription) BuildingDescription
+        +getByTypeId(typeId: String) Optional~BuildingDescription~
+    }
+
     %% Relations
-    IGridReadPort <|.. MapManager : implements
-    IGridCommandPort <|.. MapManager : implements
+    IGridReadPort <|.. Grid : implements
+    IGridCommandPort <|.. Grid : implements
     IBuildingState <|.. BuildingInstance : implements
 
-    MapManager *-- Cell : composed of
-    MapManager *-- BuildingFactory : owns
+    Grid *-- Cell : contains
+    Grid --> BuildingFactory : uses
+    BuildingFactory --> BuildingCatalog : uses
     Cell "0..1" --> "1" BuildingInstance : hosts
     BuildingFactory ..> BuildingInstance : instantiates
+    BuildingInstance --> BuildingDescription : uses
 ```
