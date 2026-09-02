@@ -1,3 +1,5 @@
+<!-- Status: current implementation reference. Keep aligned with src/main/java. -->
+
 ```mermaid
 classDiagram
 direction TB
@@ -78,7 +80,8 @@ direction TB
 
     Grid *-- Cell : contains
     Grid --> BuildingFactory : uses
-    BuildingFactory --> BuildingCatalog : uses
+    %% BuildingCatalog belongs to the application layer; Grid and the factory
+    %% receive descriptions directly and do not depend on the catalog.
     Cell "0..1" --> "1" BuildingInstance : hosts
     BuildingFactory ..> BuildingInstance : instantiates
     BuildingInstance --> BuildingDescription : uses

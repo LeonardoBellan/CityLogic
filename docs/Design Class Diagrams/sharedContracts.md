@@ -1,3 +1,5 @@
+<!-- Status: cross-cutting contract draft. Verify against the ports package before changing dependent diagrams. -->
+
 ```mermaid
 classDiagram
 direction TB

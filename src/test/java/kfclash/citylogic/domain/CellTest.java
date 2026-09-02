@@ -1,14 +1,14 @@
 package kfclash.citylogic.domain;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import kfclash.citylogic.domain.buildings.BuildingDescription;
 import kfclash.citylogic.domain.buildings.BuildingInstance;
 import kfclash.citylogic.domain.map.Cell;
 import kfclash.citylogic.domain.map.Dimension;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CellTest {
 
@@ -16,7 +16,7 @@ public class CellTest {
     private BuildingDescription buildingDescription;
     private BuildingInstance building;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         cell = new Cell(5, 10);
         Dimension footprint = new Dimension(2, 2);

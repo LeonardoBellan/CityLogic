@@ -1,10 +1,10 @@
 package kfclash.citylogic.domain;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import kfclash.citylogic.domain.map.Dimension;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DimensionTest {
 
@@ -22,34 +22,34 @@ public class DimensionTest {
         assertEquals(1, dimension.getHeight());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDimensionCreationWithZeroWidth() {
-        new Dimension(0, 10);
+        assertThrows(IllegalArgumentException.class, () -> new Dimension(0, 10));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDimensionCreationWithZeroHeight() {
-        new Dimension(10, 0);
+        assertThrows(IllegalArgumentException.class, () -> new Dimension(10, 0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDimensionCreationWithNegativeWidth() {
-        new Dimension(-5, 10);
+        assertThrows(IllegalArgumentException.class, () -> new Dimension(-5, 10));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDimensionCreationWithNegativeHeight() {
-        new Dimension(10, -5);
+        assertThrows(IllegalArgumentException.class, () -> new Dimension(10, -5));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDimensionCreationWithBothZero() {
-        new Dimension(0, 0);
+        assertThrows(IllegalArgumentException.class, () -> new Dimension(0, 0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDimensionCreationWithBothNegative() {
-        new Dimension(-1, -1);
+        assertThrows(IllegalArgumentException.class, () -> new Dimension(-1, -1));
     }
 
     @Test

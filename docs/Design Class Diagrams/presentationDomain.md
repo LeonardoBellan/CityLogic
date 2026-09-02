@@ -1,3 +1,5 @@
+<!-- Status: separate presentation/policy workstream. This diagram may not yet match the implemented facade names. -->
+
 ```mermaid
 classDiagram
     direction TB

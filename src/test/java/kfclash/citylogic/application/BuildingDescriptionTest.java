@@ -4,9 +4,9 @@ import kfclash.citylogic.domain.buildings.BuildingDescription;
 import kfclash.citylogic.domain.core.ResourceDelta;
 import kfclash.citylogic.domain.map.Dimension;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BuildingDescriptionTest {
 
@@ -21,33 +21,38 @@ public class BuildingDescriptionTest {
         assertEquals(footprint, desc.getFootprint());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBuildingDescriptionWithNullName() {
         Dimension footprint = new Dimension(2, 2);
-        new BuildingDescription(null, 100, 50, footprint);
+        assertThrows(IllegalArgumentException.class,
+                () -> new BuildingDescription(null, 100, 50, footprint));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBuildingDescriptionWithBlankName() {
         Dimension footprint = new Dimension(2, 2);
-        new BuildingDescription("   ", 100, 50, footprint);
+        assertThrows(IllegalArgumentException.class,
+                () -> new BuildingDescription("   ", 100, 50, footprint));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBuildingDescriptionWithNegativeConstructionCost() {
         Dimension footprint = new Dimension(2, 2);
-        new BuildingDescription("Building", -100, 50, footprint);
+        assertThrows(IllegalArgumentException.class,
+                () -> new BuildingDescription("Building", -100, 50, footprint));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBuildingDescriptionWithNegativeMaintenanceCost() {
         Dimension footprint = new Dimension(2, 2);
-        new BuildingDescription("Building", 100, -50, footprint);
+        assertThrows(IllegalArgumentException.class,
+                () -> new BuildingDescription("Building", 100, -50, footprint));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBuildingDescriptionWithNullFootprint() {
-        new BuildingDescription("Building", 100, 50, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> new BuildingDescription("Building", 100, 50, null));
     }
 
     @Test
@@ -90,15 +95,18 @@ public class BuildingDescriptionTest {
         assertEquals(java.math.BigDecimal.TEN, desc.getBaseProduction().budgetDelta());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBuildingDescriptionWithNullBaseProduction() {
         Dimension footprint = new Dimension(2, 2);
-        new BuildingDescription("Invalid", 100, 20, footprint, (ResourceDelta) null);
+        assertThrows(IllegalArgumentException.class,
+                () -> new BuildingDescription("Invalid", 100, 20, footprint,
+                        (kfclash.citylogic.domain.core.ResourceDelta) null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBuildingDescriptionWithEmptyName() {
         Dimension footprint = new Dimension(2, 2);
-        new BuildingDescription("", 100, 50, footprint);
+        assertThrows(IllegalArgumentException.class,
+                () -> new BuildingDescription("", 100, 50, footprint));
     }
 }

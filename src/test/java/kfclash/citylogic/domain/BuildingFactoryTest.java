@@ -1,21 +1,21 @@
 package kfclash.citylogic.domain;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import kfclash.citylogic.domain.buildings.BuildingDescription;
 import kfclash.citylogic.domain.buildings.BuildingFactory;
 import kfclash.citylogic.domain.buildings.BuildingInstance;
 import kfclash.citylogic.domain.map.Dimension;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BuildingFactoryTest {
 
     private BuildingFactory factory;
     private BuildingDescription description;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         factory = new BuildingFactory();
         Dimension footprint = new Dimension(2, 2);
@@ -64,9 +64,10 @@ public class BuildingFactoryTest {
         assertTrue(building.isPowered());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCreateBuildingWithNullDescription() {
-        factory.createBuilding(null, 0, 0);
+        assertThrows(IllegalArgumentException.class,
+                () -> factory.createBuilding(null, 0, 0));
     }
 
     @Test

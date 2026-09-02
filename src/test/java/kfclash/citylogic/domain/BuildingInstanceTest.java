@@ -5,17 +5,17 @@ import kfclash.citylogic.domain.buildings.BuildingInstance;
 import kfclash.citylogic.domain.map.Dimension;
 import kfclash.citylogic.domain.map.Point;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BuildingInstanceTest {
 
     private BuildingDescription description;
     private BuildingInstance building;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Dimension footprint = new Dimension(2, 3);
         description = new BuildingDescription("Office", 1000, 200, footprint);
@@ -31,9 +31,10 @@ public class BuildingInstanceTest {
         assertEquals(200, building.getCurrentMaintenanceCost());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBuildingInstanceWithNullDescription() {
-        new BuildingInstance(null, 0, 0);
+        assertThrows(IllegalArgumentException.class,
+                () -> new BuildingInstance(null, 0, 0));
     }
 
     @Test

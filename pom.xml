@@ -27,12 +27,6 @@
             <version>26.0.1</version>
         </dependency>
         
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
         <!-- JUnit 5 (Jupiter): unit test. Scope test = non finisce nel jar finale -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

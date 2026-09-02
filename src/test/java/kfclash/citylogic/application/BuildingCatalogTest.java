@@ -4,8 +4,11 @@ import kfclash.citylogic.domain.buildings.BuildingDescription;
 import kfclash.citylogic.domain.core.ResourceDelta;
 import kfclash.citylogic.domain.map.Dimension;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BuildingCatalogTest {
     @Test
@@ -19,7 +22,7 @@ public class BuildingCatalogTest {
         BuildingDescription sa = catalog.intern(a);
         BuildingDescription sb = catalog.intern(b);
 
-        Assert.assertTrue("Interned instances should be identical (flyweight)", sa == sb);
+        assertTrue(sa == sb, "Interned instances should be identical (flyweight)");
     }
 
     @Test
@@ -29,7 +32,7 @@ public class BuildingCatalogTest {
         catalog.register(c);
 
         BuildingDescription found = catalog.getByTypeId(c.getTypeId()).orElse(null);
-        Assert.assertNotNull(found);
-        Assert.assertEquals(c.getTypeId(), found.getTypeId());
+        assertNotNull(found);
+        assertEquals(c.getTypeId(), found.getTypeId());
     }
 }
