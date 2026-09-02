@@ -50,7 +50,7 @@ class PlacementValidatorTest {
 
     @Test
     void canPlaceReturnsFalseForNullGridOrBlankTypeId() {
-        BuildingCatalog catalog = BuildingCatalog.getInstance();
+        BuildingCatalog catalog = new BuildingCatalog();
         catalog.register(new BuildingDescription("House", 10, 1, new Dimension(1, 1)));
         PlacementValidator validator = new PlacementValidator(catalog);
 
@@ -60,7 +60,7 @@ class PlacementValidatorTest {
 
     @Test
     void canPlaceReturnsFalseForUnknownTypeId() {
-        BuildingCatalog catalog = BuildingCatalog.getInstance();
+        BuildingCatalog catalog = new BuildingCatalog();
         PlacementValidator validator = new PlacementValidator(catalog);
 
         assertFalse(validator.canPlace(0, 0, "missing", new FakeGrid(true)));
@@ -68,7 +68,7 @@ class PlacementValidatorTest {
 
     @Test
     void canPlaceUsesGridAvailabilityForKnownDescription() {
-        BuildingCatalog catalog = BuildingCatalog.getInstance();
+        BuildingCatalog catalog = new BuildingCatalog();
         BuildingDescription description = new BuildingDescription("House", 10, 1, new Dimension(2, 1));
         catalog.register(description);
         PlacementValidator validator = new PlacementValidator(catalog);
@@ -79,7 +79,7 @@ class PlacementValidatorTest {
 
     @Test
     void canPlaceWithDescriptionObjectReturnsFalseForNullInputs() {
-        BuildingCatalog catalog = BuildingCatalog.getInstance();
+        BuildingCatalog catalog = new BuildingCatalog();
         PlacementValidator validator = new PlacementValidator(catalog);
 
         assertFalse(validator.canPlace(0, 0, (BuildingDescription) null, new FakeGrid(true)));

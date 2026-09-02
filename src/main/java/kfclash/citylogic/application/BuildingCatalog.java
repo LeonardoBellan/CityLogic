@@ -9,33 +9,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import kfclash.citylogic.domain.buildings.BuildingDescription;
 
 /**
- * A simple flyweight catalog for shared BuildingDescription instances.
+ * Application-level registry for user-selectable building descriptions.
  */
 public final class BuildingCatalog {
-    private static final BuildingCatalog INSTANCE = new BuildingCatalog();
     private final Map<String, BuildingDescription> byTypeId = new ConcurrentHashMap<>();
 
-    private BuildingCatalog() {
+    public BuildingCatalog() {
     }
 
-    public static BuildingCatalog getInstance() {
-        return INSTANCE;
-    }
-
-    /**
-     * Returns a shared BuildingDescription instance for the same typeId. If a description
-     * with the same typeId is already present, it is returned; otherwise the provided
-     * description is stored and returned.
-     */
     public BuildingDescription intern(BuildingDescription description) {
         if (description == null) {
             throw new IllegalArgumentException("description cannot be null");
         }
-        return byTypeId.computeIfAbsent(description.getTypeId(), k -> description);
+        return byTypeId.computeIfAbsent(description.getTypeId(), key -> description);
     }
 
     public Optional<BuildingDescription> getByTypeId(String typeId) {
-        if (typeId == null) return Optional.empty();
+        if (typeId == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(byTypeId.get(typeId));
     }
 

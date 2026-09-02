@@ -11,12 +11,10 @@ import kfclash.citylogic.domain.map.Dimension;
 Registers a set of standard BuildingDescription instances into the
 BuildingCatalog.*/
 public final class ApplicationBuildingDescriptionProvider {
-    static {
-        initDefaultCatalog();
-    }
-
-    public static void initDefaultCatalog() {
-        BuildingCatalog catalog = BuildingCatalog.getInstance();
+    public static void initDefaultCatalog(BuildingCatalog catalog) {
+        if (catalog == null) {
+            throw new IllegalArgumentException("catalog cannot be null");
+        }
 
         // House: Impatta esclusivamente la popolazione (incremento di +4)
         BuildingDescription house = new BuildingDescription(

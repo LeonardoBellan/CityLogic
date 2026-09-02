@@ -1,13 +1,10 @@
 package kfclash.citylogic.application;
 
 import kfclash.citylogic.domain.buildings.BuildingDescription;
+import kfclash.citylogic.domain.core.ResourceDelta;
 import kfclash.citylogic.domain.map.Dimension;
-import kfclash.citylogic.domain.map.Resource;
 
 import org.junit.Test;
-
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -84,23 +81,19 @@ public class BuildingDescriptionTest {
     }
 
     @Test
-    public void testBuildingDescriptionBaseProductionImmutability() {
+    public void testBuildingDescriptionBaseProductionIsImmutableByValueSemantics() {
         Dimension footprint = new Dimension(2, 2);
-        List<Resource> production = Collections.singletonList(new Resource("energy", 10));
-        BuildingDescription desc = new BuildingDescription("PowerPlant", 500, 100, footprint,
-                kfclash.citylogic.domain.core.ResourceDelta.zero());
+        ResourceDelta production = new ResourceDelta(java.math.BigDecimal.TEN, 0.0, 0, 1.0);
+        BuildingDescription desc = new BuildingDescription("PowerPlant", 500, 100, footprint, production);
 
-        try {
-            desc.getBaseProduction().add(new Resource("water", 5));
-            fail("Expected UnsupportedOperationException");
-        } catch (UnsupportedOperationException expected) {
-        }
+        assertEquals(production, desc.getBaseProduction());
+        assertEquals(java.math.BigDecimal.TEN, desc.getBaseProduction().budgetDelta());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuildingDescriptionWithNullBaseProduction() {
         Dimension footprint = new Dimension(2, 2);
-        new BuildingDescription("Invalid", 100, 20, footprint, (kfclash.citylogic.domain.core.ResourceDelta) null);
+        new BuildingDescription("Invalid", 100, 20, footprint, (ResourceDelta) null);
     }
 
     @Test(expected = IllegalArgumentException.class)
