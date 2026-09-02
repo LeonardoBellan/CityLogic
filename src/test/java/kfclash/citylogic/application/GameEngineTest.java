@@ -135,7 +135,7 @@ class GameEngineTest {
     @Test
     void placeBuildingUsesCatalogAndValidator() {
         RecordingGrid grid = new RecordingGrid();
-        BuildingCatalog catalog = BuildingCatalog.getInstance();
+        BuildingCatalog catalog = new BuildingCatalog();
         BuildingDescription description = new BuildingDescription(
                 "Test House", 120, 10, new Dimension(1, 1));
         catalog.register(description);
@@ -158,7 +158,7 @@ class GameEngineTest {
     @Test
     void advanceTimeDelegatesToSimulationEngine() {
         RecordingGrid grid = new RecordingGrid();
-        BuildingCatalog catalog = BuildingCatalog.getInstance();
+        BuildingCatalog catalog = new BuildingCatalog();
         CityAggregate city = new CityAggregate(new BigDecimal("1000"), 0, 50.0);
         SimulationEngine simulation = new SimulationEngine(
                 city,
@@ -177,7 +177,7 @@ class GameEngineTest {
     @Test
     void demolishBuildingDelegatesToGridAndReturnsTrueWhenRemoved() {
         RecordingGrid grid = new RecordingGrid();
-        BuildingCatalog catalog = BuildingCatalog.getInstance();
+        BuildingCatalog catalog = new BuildingCatalog();
         CityAggregate city = new CityAggregate(new BigDecimal("1000"), 0, 50.0);
         SimulationEngine simulation = new SimulationEngine(
                 city,
@@ -195,7 +195,7 @@ class GameEngineTest {
     @Test
     void policiesAreForwardedToSimulationEngine() {
         RecordingGrid grid = new RecordingGrid();
-        BuildingCatalog catalog = BuildingCatalog.getInstance();
+        BuildingCatalog catalog = new BuildingCatalog();
         CityAggregate city = new CityAggregate(new BigDecimal("1000"), 0, 50.0);
         SimulationEngine simulation = new SimulationEngine(
                 city,

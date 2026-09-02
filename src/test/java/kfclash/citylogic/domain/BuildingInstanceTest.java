@@ -4,13 +4,9 @@ import kfclash.citylogic.domain.buildings.BuildingDescription;
 import kfclash.citylogic.domain.buildings.BuildingInstance;
 import kfclash.citylogic.domain.map.Dimension;
 import kfclash.citylogic.domain.map.Point;
-import kfclash.citylogic.domain.map.Resource;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.*;
 

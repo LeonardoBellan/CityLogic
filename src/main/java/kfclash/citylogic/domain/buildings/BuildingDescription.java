@@ -1,12 +1,9 @@
 package kfclash.citylogic.domain.buildings;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import kfclash.citylogic.domain.core.ResourceDelta;
 import kfclash.citylogic.domain.map.Dimension;
-import kfclash.citylogic.domain.map.Resource;
 
 public final class BuildingDescription {
     private final String typeId;
@@ -15,23 +12,13 @@ public final class BuildingDescription {
     private final int baseMaintenanceCost;
     private final Dimension footprint;
     private final ResourceDelta baseProduction;
-    private final List<Resource> legacyResources;
 
     public BuildingDescription(String name, int constructionCost, int baseMaintenanceCost, Dimension footprint) {
-        this(name, constructionCost, baseMaintenanceCost, footprint, ResourceDelta.zero(), List.of());
+        this(name, constructionCost, baseMaintenanceCost, footprint, ResourceDelta.zero());
     }
 
-    public BuildingDescription(String name, int constructionCost, int baseMaintenanceCost, Dimension footprint, ResourceDelta baseProduction) {
-        this(name, constructionCost, baseMaintenanceCost, footprint, Objects.requireNonNull(baseProduction, "baseProduction cannot be null"), List.of());
-    }
-
-    /** Compatibility constructor used by older tests that still pass a legacy resource list. */
-    public BuildingDescription(String name, int constructionCost, int baseMaintenanceCost, Dimension footprint, List<Resource> production) {
-        this(name, constructionCost, baseMaintenanceCost, footprint,
-                ResourceDelta.zero(), List.copyOf(production == null ? List.of() : production));
-    }
-
-    public BuildingDescription(String name, int constructionCost, int baseMaintenanceCost, Dimension footprint, ResourceDelta baseProduction, List<Resource> legacyResources) {
+    public BuildingDescription(String name, int constructionCost, int baseMaintenanceCost, Dimension footprint,
+            ResourceDelta baseProduction) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("BuildingDescription name cannot be null or blank");
         }
@@ -41,16 +28,12 @@ public final class BuildingDescription {
         if (footprint == null) {
             throw new IllegalArgumentException("Footprint cannot be null");
         }
-        if (baseProduction == null) {
-            throw new IllegalArgumentException("Base production cannot be null");
-        }
-        this.legacyResources = legacyResources == null ? List.of() : List.copyOf(legacyResources);
+        this.baseProduction = Objects.requireNonNull(baseProduction, "baseProduction cannot be null");
         this.typeId = normalizeTypeId(name);
         this.name = name;
         this.constructionCost = constructionCost;
         this.baseMaintenanceCost = baseMaintenanceCost;
         this.footprint = footprint;
-        this.baseProduction = baseProduction;
     }
 
     public String getTypeId() {
@@ -79,14 +62,6 @@ public final class BuildingDescription {
 
     public ResourceDelta getBaseProduction() {
         return baseProduction;
-    }
-
-    public List<Resource> getLegacyResources() {
-        return Collections.unmodifiableList(legacyResources);
-    }
-
-    public List<Resource> getProduction() {
-        return getLegacyResources();
     }
 
     @Override
