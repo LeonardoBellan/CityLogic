@@ -1,3 +1,5 @@
+<!-- Status: current implementation reference. Keep aligned with src/main/java. -->
+
 ```mermaid
 classDiagram
     direction TB
@@ -40,8 +42,11 @@ classDiagram
         -gridReader: IGridReadPort
         -eventPublisher: ICityEventPublisher
         +advanceTick() void
+        +getCurrentSnapshot() CitySnapshot
+        +loadState(snapshot: CitySnapshot) void
         +activatePolicy(policy: IPolicyStrategy) void
         +deactivatePolicy(policyName: String) void
+        +getActivePolicyNames() List~String~
     }
 
     class ITickPhase {

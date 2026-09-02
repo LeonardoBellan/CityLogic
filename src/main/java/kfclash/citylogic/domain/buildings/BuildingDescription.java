@@ -28,7 +28,7 @@ public final class BuildingDescription {
         if (footprint == null) {
             throw new IllegalArgumentException("Footprint cannot be null");
         }
-        this.baseProduction = Objects.requireNonNull(baseProduction, "baseProduction cannot be null");
+        this.baseProduction = requireBaseProduction(baseProduction);
         this.typeId = normalizeTypeId(name);
         this.name = name;
         this.constructionCost = constructionCost;
@@ -64,6 +64,12 @@ public final class BuildingDescription {
         return baseProduction;
     }
 
+    private static ResourceDelta requireBaseProduction(ResourceDelta baseProduction) {
+        if (baseProduction == null) {
+            throw new IllegalArgumentException("Base production cannot be null");
+        }
+        return baseProduction;
+    }
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

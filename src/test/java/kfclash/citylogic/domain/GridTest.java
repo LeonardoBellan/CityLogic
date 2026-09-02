@@ -7,12 +7,12 @@ import kfclash.citylogic.domain.map.Cell;
 import kfclash.citylogic.domain.map.Dimension;
 import kfclash.citylogic.domain.map.Grid;
 import kfclash.citylogic.ports.IBuildingState;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GridTest {
 
@@ -21,7 +21,7 @@ public class GridTest {
     private Dimension mapDimension;
     private BuildingDescription buildingDescription;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         factory = new BuildingFactory();
         mapDimension = new Dimension(10, 10);
@@ -36,14 +36,14 @@ public class GridTest {
         assertEquals(10, grid.getDimensions().getHeight());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGridWithNullDimensions() {
-        new Grid(null, factory);
+        assertThrows(IllegalArgumentException.class, () -> new Grid(null, factory));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testGridWithNullFactory() {
-        new Grid(mapDimension, null);
+        assertThrows(IllegalArgumentException.class, () -> new Grid(mapDimension, null));
     }
 
     @Test
@@ -116,6 +116,12 @@ public class GridTest {
     }
 
     @Test
+    public void testGetTerrainAtOutOfBoundsReturnsNull() {
+        assertNull(grid.getTerrainAt(-1, 0));
+        assertNull(grid.getTerrainAt(10, 10));
+    }
+
+    @Test
     public void testGetBuildingByIdReturnsExpectedBuilding() {
         BuildingInstance building = grid.constructBuildingAt(0, 0, buildingDescription);
         assertTrue(grid.getBuildingById(building.getId()).isPresent());
@@ -144,35 +150,44 @@ public class GridTest {
     }
 
     @Test
+    public void testGetAdjacentBuildingsWithInvalidInputReturnsEmptyList() {
+        assertTrue(grid.getAdjacentBuildings(null, 1).isEmpty());
+        assertTrue(grid.getAdjacentBuildings("missing", 1).isEmpty());
+        assertTrue(grid.getAdjacentBuildings("missing", -1).isEmpty());
+    }
+
+    @Test
     public void testIsAreaFreeReflectsOccupiedCells() {
         assertTrue(grid.isAreaFree(0, 0, buildingDescription.getFootprint()));
         grid.constructBuildingAt(0, 0, buildingDescription);
         assertFalse(grid.isAreaFree(0, 0, buildingDescription.getFootprint()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConstructBuildingWithNullDescription() {
-        grid.constructBuildingAt(0, 0, null);
+        assertThrows(IllegalArgumentException.class, () -> grid.constructBuildingAt(0, 0, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConstructBuildingOutOfBounds() {
-        grid.constructBuildingAt(9, 9, buildingDescription);
+        assertThrows(IllegalArgumentException.class,
+                () -> grid.constructBuildingAt(9, 9, buildingDescription));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConstructBuildingOnOccupiedCell() {
         grid.constructBuildingAt(0, 0, buildingDescription);
-        grid.constructBuildingAt(0, 0, buildingDescription);
+        assertThrows(IllegalArgumentException.class,
+                () -> grid.constructBuildingAt(0, 0, buildingDescription));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testConstructBuildingOnPartiallyOccupiedSpace() {
         grid.constructBuildingAt(0, 0, buildingDescription);
         
         Dimension footprint = new Dimension(2, 2);
         BuildingDescription desc = new BuildingDescription("Another Building", 300, 75, footprint);
-        grid.constructBuildingAt(1, 1, desc);
+        assertThrows(IllegalArgumentException.class, () -> grid.constructBuildingAt(1, 1, desc));
     }
 
     @Test
@@ -194,6 +209,20 @@ public class GridTest {
         assertFalse(grid.getCell(4, 3).isOccupied());
         assertFalse(grid.getCell(3, 4).isOccupied());
         assertFalse(grid.getCell(4, 4).isOccupied());
+    }
+
+    @Test
+    public void testRemoveBuildingFromInteriorCellClearsWholeFootprint() {
+        BuildingInstance building = grid.constructBuildingAt(3, 3, buildingDescription);
+
+        BuildingInstance removed = grid.removeBuildingAt(4, 4);
+
+        assertEquals(building.getId(), removed.getId());
+        assertFalse(grid.getCell(3, 3).isOccupied());
+        assertFalse(grid.getCell(4, 3).isOccupied());
+        assertFalse(grid.getCell(3, 4).isOccupied());
+        assertFalse(grid.getCell(4, 4).isOccupied());
+        assertTrue(grid.getAllBuildings().isEmpty());
     }
 
     @Test
