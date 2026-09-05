@@ -1,4 +1,4 @@
-package kfclash.citylogic.tick;
+package kfclash.citylogic.simulation.tick;
 
 import kfclash.citylogic.domain.core.CitySnapshot;
 import kfclash.citylogic.domain.core.ResourceDelta;

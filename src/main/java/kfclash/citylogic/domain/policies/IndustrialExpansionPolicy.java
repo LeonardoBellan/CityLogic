@@ -1,4 +1,4 @@
-package kfclash.citylogic.policies;
+package kfclash.citylogic.domain.policies;
 
 import java.math.BigDecimal;
 import java.util.Set;

@@ -3,7 +3,7 @@ package kfclash.citylogic.application;
 import java.util.Objects;
 
 import kfclash.citylogic.domain.buildings.BuildingDescription;
-import kfclash.citylogic.engine.SimulationEngine;
+import kfclash.citylogic.simulation.engine.SimulationEngine;
 import kfclash.citylogic.ports.IGridCommandPort;
 import kfclash.citylogic.ports.IGridReadPort;
 import kfclash.citylogic.ports.IPolicyStrategy;

@@ -1,4 +1,4 @@
-package kfclash.citylogic.tick;
+package kfclash.citylogic.simulation.tick;
 
 import java.util.ArrayList;
 import java.util.Collections;

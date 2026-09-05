@@ -1,4 +1,4 @@
-package kfclash.citylogic.tick;
+package kfclash.citylogic.simulation.tick;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

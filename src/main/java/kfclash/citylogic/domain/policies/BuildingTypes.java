@@ -1,4 +1,4 @@
-package kfclash.citylogic.policies;
+package kfclash.citylogic.domain.policies;
 
 import java.util.Locale;
 import java.util.Map;

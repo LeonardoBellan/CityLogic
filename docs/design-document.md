@@ -4,13 +4,13 @@ This document describes the implemented Building/map domain and simulation engin
 
 ## Scope and boundaries
 
-| Area                      | Responsibility                                                                             | Main types                                                                   |
-| ------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| Building/map domain       | Store the grid, query spatial state, validate footprints, place and remove buildings       | `Grid`, `Cell`, `BuildingDescription`, `BuildingInstance`, `BuildingFactory` |
-| Application orchestration | Resolve building types, validate commands, and delegate map/time operations                | `GameEngine`, `BuildingCatalog`, `PlacementValidator`                        |
-| Simulation engine         | Execute phases, aggregate metric deltas, and commit or roll back city state                | `SimulationEngine`, `ITickPhase`, `CityAggregate`, `ResourceDelta`           |
-| Policy                    | Provide strategies evaluated by a simulation phase; detailed policy rules are out of scope | `IPolicyStrategy`, `PolicyEvaluationPhase`                                   |
-| UI/presentation           | Consume commands and published snapshots; out of scope here                                | Presentation module                                                          |
+| Area                      | Responsibility                                                                                 | Main types                                                                   |
+| ------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Building/map domain       | Store the grid, query spatial state, validate footprints, place and remove buildings           | `Grid`, `Cell`, `BuildingDescription`, `BuildingInstance`, `BuildingFactory` |
+| Application orchestration | Resolve building types, validate commands, and delegate map/time operations                    | `GameEngine`, `BuildingCatalog`, `PlacementValidator`                        |
+| Simulation engine         | Execute phases, aggregate metric deltas, and commit or roll back city state                    | `SimulationEngine`, `ITickPhase`, `CityAggregate`, `ResourceDelta`           |
+| Domain policy             | Define business rules evaluated by a simulation phase; orchestration remains in the tick layer | `IPolicyStrategy`, concrete policies, `PolicyEvaluationPhase`                |
+| UI/presentation           | Consume commands and published snapshots; out of scope here                                    | Presentation module                                                          |
 
 `Grid` implements both `IGridReadPort` and `IGridCommandPort`. The simulation engine receives only `IGridReadPort`, so phases cannot mutate the map. `GameEngine` is the application-facing facade used by the presentation layer.
 

@@ -1,4 +1,4 @@
-package kfclash.citylogic.engine;
+package kfclash.citylogic.simulation.engine;
 
 import java.util.List;
 import java.util.Objects;
@@ -11,9 +11,9 @@ import kfclash.citylogic.ports.ICityEventPublisher;
 import kfclash.citylogic.ports.IGridReadPort;
 import kfclash.citylogic.ports.IPolicyStrategy;
 import kfclash.citylogic.ports.ITickPhase;
-import kfclash.citylogic.tick.PolicyEvaluationPhase;
-import kfclash.citylogic.tick.SimulationConfig;
-import kfclash.citylogic.tick.TickPhaseFactory;
+import kfclash.citylogic.simulation.tick.PolicyEvaluationPhase;
+import kfclash.citylogic.simulation.tick.SimulationConfig;
+import kfclash.citylogic.simulation.tick.TickPhaseFactory;
 
 /**
  * Facade del Core (pattern GoF Facade): l'unico punto d'ingresso con cui il

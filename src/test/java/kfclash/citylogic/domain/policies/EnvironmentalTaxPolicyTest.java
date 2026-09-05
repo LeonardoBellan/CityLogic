@@ -1,4 +1,4 @@
-package kfclash.citylogic.policies;
+package kfclash.citylogic.domain.policies;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;

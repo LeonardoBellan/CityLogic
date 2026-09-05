@@ -1,4 +1,4 @@
-package kfclash.citylogic.tick;
+package kfclash.citylogic.simulation.tick;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

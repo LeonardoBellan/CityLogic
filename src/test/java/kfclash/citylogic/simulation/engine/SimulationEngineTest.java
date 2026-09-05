@@ -1,4 +1,4 @@
-package kfclash.citylogic.engine;
+package kfclash.citylogic.simulation.engine;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,8 +23,8 @@ import kfclash.citylogic.ports.ICityObserver;
 import kfclash.citylogic.ports.IGridReadPort;
 import kfclash.citylogic.ports.IPolicyStrategy;
 import kfclash.citylogic.testutil.FakeGridReadPort;
-import kfclash.citylogic.tick.SimulationConfig;
-import kfclash.citylogic.tick.TickPhaseFactory;
+import kfclash.citylogic.simulation.tick.SimulationConfig;
+import kfclash.citylogic.simulation.tick.TickPhaseFactory;
 
 /**
  * Test di integrazione del {@link SimulationEngine}: verifica il flusso

@@ -1,4 +1,4 @@
-package kfclash.citylogic.policies;
+package kfclash.citylogic.domain.policies;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,7 +16,7 @@ import kfclash.citylogic.domain.core.CityAggregate;
 import kfclash.citylogic.domain.core.CitySnapshot;
 import kfclash.citylogic.domain.core.ResourceDelta;
 import kfclash.citylogic.testutil.FakeGridReadPort;
-import kfclash.citylogic.tick.PolicyEvaluationPhase;
+import kfclash.citylogic.simulation.tick.PolicyEvaluationPhase;
 
 /**
  * Integrazione fra le ordinanze concrete, la {@link PolicyEvaluationPhase} e

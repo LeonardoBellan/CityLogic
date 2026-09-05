@@ -17,14 +17,14 @@ import kfclash.citylogic.domain.buildings.BuildingDescription;
 import kfclash.citylogic.domain.core.CityAggregate;
 import kfclash.citylogic.domain.core.CitySnapshot;
 import kfclash.citylogic.domain.map.Dimension;
-import kfclash.citylogic.engine.SimulationEngine;
+import kfclash.citylogic.simulation.engine.SimulationEngine;
 import kfclash.citylogic.ports.IBuildingState;
 import kfclash.citylogic.ports.ICityEventPublisher;
 import kfclash.citylogic.ports.ICityObserver;
 import kfclash.citylogic.ports.IGridCommandPort;
 import kfclash.citylogic.ports.IGridReadPort;
-import kfclash.citylogic.tick.SimulationConfig;
-import kfclash.citylogic.tick.TickPhaseFactory;
+import kfclash.citylogic.simulation.tick.SimulationConfig;
+import kfclash.citylogic.simulation.tick.TickPhaseFactory;
 
 class GameEngineTest {
 
