@@ -1,4 +1,4 @@
-package kfclash.citylogic.domain;
+package kfclash.citylogic.domain.core;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,4 +1,4 @@
-package kfclash.citylogic.domain;
+package kfclash.citylogic.domain.map;
 
 import org.junit.jupiter.api.Test;
 

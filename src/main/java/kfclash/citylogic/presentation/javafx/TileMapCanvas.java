@@ -3,7 +3,6 @@ package kfclash.citylogic.presentation.javafx;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 public class TileMapCanvas extends Canvas {
 

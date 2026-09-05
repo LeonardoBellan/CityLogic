@@ -1,4 +1,4 @@
-package kfclash.citylogic.domain;
+package kfclash.citylogic.domain.buildings;
 
 import kfclash.citylogic.domain.buildings.BuildingDescription;
 import kfclash.citylogic.domain.buildings.BuildingInstance;
