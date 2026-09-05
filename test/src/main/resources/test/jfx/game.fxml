@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="test.jfx.gameController"
+           stylesheets="@styles.css">
+
+    <!-- LAYER 1: Tilemap (bottom, pannable/zoomable) -->
+    <Pane fx:id="mapContainer" styleClass="map-container"/>
+
+    <!-- LAYER 2: Static UI Overlay (top, non-interactive pass-through) -->
+    <BorderPane mouseTransparent="false" pickOnBounds="false">
+
+        <!-- TOP BAR -->
+        <top>
+            <HBox styleClass="stat-bar" alignment="CENTER_LEFT">
+                <!-- Money -->
+                <VBox alignment="CENTER_LEFT" spacing="1">
+                    <Label text="TREASURY"  styleClass="stat-label"/>
+                    <Label fx:id="lblMoney"      text="§ 50,000"     styleClass="stat-value-positive"/>
+                </VBox>
+                <Pane styleClass="stat-divider"/>
+                <!-- Population -->
+                <VBox alignment="CENTER_LEFT" spacing="1">
+                    <Label text="POPULATION" styleClass="stat-label"/>
+                    <Label fx:id="lblPopulation" text="4,200"        styleClass="stat-value"/>
+                </VBox>
+                <Pane styleClass="stat-divider"/>
+                <!-- Happiness -->
+                <VBox alignment="CENTER_LEFT" spacing="1">
+                    <Label text="HAPPINESS"  styleClass="stat-label"/>
+                    <Label fx:id="lblHappiness"  text="74%"          styleClass="stat-value-positive"/>
+                </VBox>
+                <Pane styleClass="stat-divider"/>
+                <!-- Date -->
+                <VBox alignment="CENTER_LEFT" spacing="1">
+                    <Label text="DATE"       styleClass="stat-label"/>
+                    <Label fx:id="lblDate"       text="Jan 2025"     styleClass="stat-value"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+        </top>
+
+        <!-- BOTTOM BAR -->
+        <bottom>
+        </bottom>
+
+    </BorderPane>
+
+    <!-- LAYER 3: Pause overlay -->
+    <StackPane fx:id="pauseOverlay" visible="false" pickOnBounds="true"
+               styleClass="pause-overlay">
+
+        <VBox alignment="CENTER" spacing="16" maxWidth="300" maxHeight="380"
+              styleClass="card">
+
+            <Label text="PAUSED" styleClass="title-label"/>
+
+            <Separator styleClass="separator-primary" prefWidth="200"/>
+
+            <Button text="Resume"     onAction="#onResume"        prefWidth="180" styleClass="btn,btn-primary"/>
+            <Button text="Reset View" onAction="#onResetFromPause" prefWidth="180" styleClass="btn,btn-secondary"/>
+            <Button text="Main Menu"  onAction="#onMainMenu"      prefWidth="180" styleClass="btn,btn-danger"/>
+        </VBox>
+    </StackPane>
+
+</StackPane>
