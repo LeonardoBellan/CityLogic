@@ -1,14 +1,24 @@
 package kfclash.citylogic.presentation.javafx;
 
 import javafx.fxml.FXML;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 
-public class gameController {
+import java.math.RoundingMode;
+
+import kfclash.citylogic.domain.core.CitySnapshot;
+import kfclash.citylogic.domain.map.Dimension;
+import kfclash.citylogic.ports.IBuildingState;
+import kfclash.citylogic.ports.ICityObserver;
+
+public class gameController implements ICityObserver {
 
     @FXML private Pane       mapContainer;
     @FXML private StackPane  pauseOverlay;
@@ -22,6 +32,7 @@ public class gameController {
     private double        dragStartX, dragStartY;
     private double        translateX = 0, translateY = 0;
     private double        scale      = 1.0;
+    private String         selectedBuildingType = "house";
 
     private static final double ZOOM_FACTOR = 1.15;
     private static final double ZOOM_MIN    = 0.2;
@@ -32,16 +43,14 @@ public class gameController {
 
         tileMap = new TileMapCanvas(48);
         mapContainer.getChildren().add(tileMap);
+        refreshMap();
 
-        
-        App.askEngine().addPropertyChangeListener(e -> {
-            if ("map".equals(e.getPropertyName())) {
-                tileMap.setMap((int[][]) e.getNewValue());
-            }
-        });
+        App.askEventPublisher().subscribe(this);
+        onMetricsChanged(App.askSimulationEngine().getCurrentSnapshot());
 
         setupPan();
         setupZoom();
+        setupPlacement();
         setupHover();
         applyTransform();
 
@@ -53,6 +62,50 @@ public class gameController {
                 });
             }
         });
+    }
+
+    @Override
+    public void onMetricsChanged(CitySnapshot snapshot) {
+        Runnable update = () -> {
+            lblMoney.setText("$ " + snapshot.budget().setScale(0, RoundingMode.HALF_UP));
+            lblPopulation.setText(Integer.toString(snapshot.population()));
+            lblHappiness.setText(String.format("%.0f%%", snapshot.happiness()));
+            lblDate.setText("Jan " + (2025 + snapshot.tickCount()));
+        };
+        if (Platform.isFxApplicationThread()) {
+            update.run();
+        } else {
+            Platform.runLater(update);
+        }
+    }
+
+    private void refreshMap() {
+        Dimension dimensions = App.askGrid().getDimensions();
+        int[][] map = new int[dimensions.getHeight()][dimensions.getWidth()];
+        for (IBuildingState building : App.askGrid().getAllBuildings()) {
+            int tile = tileFor(building.getType());
+            int startX = building.getPosition().getX();
+            int startY = building.getPosition().getY();
+            Dimension footprint = building.getDescription().getFootprint();
+            for (int y = startY; y < startY + footprint.getHeight(); y++) {
+                for (int x = startX; x < startX + footprint.getWidth(); x++) {
+                    if (y >= 0 && y < map.length && x >= 0 && x < map[y].length) {
+                        map[y][x] = tile;
+                    }
+                }
+            }
+        }
+        tileMap.setMap(map);
+    }
+
+    private static int tileFor(String buildingType) {
+        return switch (buildingType.toLowerCase()) {
+            case "park" -> 2;
+            case "water" -> 3;
+            case "highway" -> 5;
+            case "roof" -> 6;
+            default -> 1;
+        };
     }
 
     // ── Pause logic ──────────────────────────────────────────────────
@@ -112,6 +165,44 @@ public class gameController {
             translateY = e.getY() - factor * (e.getY() - translateY);
             applyTransform();
         });
+    }
+
+    private void setupPlacement() {
+        mapContainer.setOnMouseClicked(event -> {
+            if (isPaused || event.getButton() != MouseButton.PRIMARY) {
+                return;
+            }
+            double canvasX = (event.getX() - translateX) / scale;
+            double canvasY = (event.getY() - translateY) / scale;
+            int[] tile = tileMap.getTileAt(canvasX, canvasY);
+            if (tile != null && App.askGameEngine().placeBuilding(
+                    tile[0], tile[1], selectedBuildingType)) {
+                refreshMap();
+            }
+        });
+    }
+
+    @FXML
+    private void selectHouse() {
+        selectedBuildingType = "house";
+    }
+
+    @FXML
+    private void selectFactory() {
+        selectedBuildingType = "factory";
+    }
+
+    @FXML
+    private void selectPark() {
+        selectedBuildingType = "park";
+    }
+
+    @FXML
+    private void advanceTime() {
+        if (!isPaused) {
+            App.askGameEngine().advanceTime();
+            refreshMap();
+        }
     }
 
     // ── Hover ─────────────────────────────────────────────────────────

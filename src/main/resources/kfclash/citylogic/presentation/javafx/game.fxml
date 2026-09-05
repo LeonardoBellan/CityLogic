@@ -45,6 +45,14 @@
 
         <!-- BOTTOM BAR -->
         <bottom>
+            <HBox styleClass="hud-bar-bottom" alignment="CENTER_LEFT" spacing="8">
+                <Label text="BUILD:" styleClass="hud-label"/>
+                <Button text="House" onAction="#selectHouse" styleClass="btn-toolbar"/>
+                <Button text="Factory" onAction="#selectFactory" styleClass="btn-toolbar"/>
+                <Button text="Park" onAction="#selectPark" styleClass="btn-toolbar"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Advance Tick" onAction="#advanceTime" styleClass="btn-primary"/>
+            </HBox>
         </bottom>
 
     </BorderPane>
