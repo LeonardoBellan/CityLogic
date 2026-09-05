@@ -16,6 +16,10 @@ public class App extends Application {
     private static Scene scene;
     public static CityEngine cityEngine = new CityEngine();
 
+    static CityEngine askEngine() {
+        return cityEngine;
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("menu"), 640, 480);
