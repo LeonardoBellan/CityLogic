@@ -1,4 +1,4 @@
-package test.jfx;
+package kfclash.citylogic.presentation.javafx;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

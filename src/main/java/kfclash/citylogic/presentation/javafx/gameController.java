@@ -1,4 +1,4 @@
-package test.jfx;
+package kfclash.citylogic.presentation.javafx;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

@@ -1,8 +1,8 @@
-module test.jfx {
+module kfclash.citylogic {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.desktop; // for PropertyChangeSupport
 
-    opens test.jfx to javafx.fxml;
-    exports test.jfx;
+    opens kfclash.citylogic.presentation.javafx to javafx.fxml;
+    exports kfclash.citylogic.presentation.javafx;
 }

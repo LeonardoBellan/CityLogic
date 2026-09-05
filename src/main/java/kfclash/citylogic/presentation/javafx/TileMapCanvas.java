@@ -1,4 +1,4 @@
-package test.jfx;
+package kfclash.citylogic.presentation.javafx;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;

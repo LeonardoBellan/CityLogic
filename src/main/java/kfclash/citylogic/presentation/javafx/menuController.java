@@ -1,4 +1,4 @@
-package test.jfx;
+package kfclash.citylogic.presentation.javafx;
 
 import java.io.IOException;
 import javafx.fxml.FXML;

@@ -56,7 +56,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>test.jfx.App</mainClass>
+                            <mainClass>kfclash.citylogic.presentation.javafx.App</mainClass>
                         </configuration>
                     </execution>
                 </executions>

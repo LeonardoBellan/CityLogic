@@ -1,4 +1,4 @@
-package test.jfx;
+package kfclash.citylogic.presentation.javafx;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
