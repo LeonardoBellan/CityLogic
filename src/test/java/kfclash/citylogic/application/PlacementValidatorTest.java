@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import kfclash.citylogic.domain.buildings.BuildingDescription;
+import kfclash.citylogic.domain.buildings.BuildingInstance;
 import kfclash.citylogic.domain.map.Dimension;
 import kfclash.citylogic.ports.IBuildingState;
 import kfclash.citylogic.ports.IGridReadPort;
@@ -17,9 +18,15 @@ class PlacementValidatorTest {
 
     private static final class FakeGrid implements IGridReadPort {
         private final boolean areaFree;
+        private final List<IBuildingState> buildings;
 
         private FakeGrid(boolean areaFree) {
+            this(areaFree, List.of());
+        }
+
+        private FakeGrid(boolean areaFree, List<IBuildingState> buildings) {
             this.areaFree = areaFree;
+            this.buildings = buildings;
         }
 
         @Override
@@ -34,7 +41,7 @@ class PlacementValidatorTest {
 
         @Override
         public List<IBuildingState> getAllBuildings() {
-            return List.of();
+            return buildings;
         }
 
         @Override
@@ -69,7 +76,7 @@ class PlacementValidatorTest {
     @Test
     void canPlaceUsesGridAvailabilityForKnownDescription() {
         BuildingCatalog catalog = new BuildingCatalog();
-        BuildingDescription description = new BuildingDescription("House", 10, 1, new Dimension(2, 1));
+        BuildingDescription description = new BuildingDescription("Factory", 10, 1, new Dimension(2, 1));
         catalog.register(description);
         PlacementValidator validator = new PlacementValidator(catalog);
 
@@ -84,5 +91,34 @@ class PlacementValidatorTest {
 
         assertFalse(validator.canPlace(0, 0, (BuildingDescription) null, new FakeGrid(true)));
         assertFalse(validator.canPlace(0, 0, new BuildingDescription("House", 10, 1, new Dimension(1, 1)), null));
+    }
+
+    @Test
+    void residentialBuildingRequiresNearbyRoad() {
+        BuildingCatalog catalog = new BuildingCatalog();
+        BuildingDescription house = new BuildingDescription("House", 10, 1, new Dimension(1, 1));
+        BuildingDescription road = new BuildingDescription("Road", 10, 1, new Dimension(1, 1));
+        catalog.register(house);
+        PlacementValidator validator = new PlacementValidator(catalog);
+
+        IBuildingState nearbyRoad = new BuildingInstance(road, 1, 0);
+        IBuildingState distantRoad = new BuildingInstance(road, 4, 4);
+
+        assertTrue(validator.canPlace(0, 0, house.getTypeId(),
+                new FakeGrid(true, List.of(nearbyRoad))));
+        assertFalse(validator.canPlace(0, 0, house.getTypeId(),
+                new FakeGrid(true, List.of(distantRoad))));
+    }
+
+    @Test
+    void commercialBuildingUsesTheSameRoadAccessRule() {
+        BuildingCatalog catalog = new BuildingCatalog();
+        BuildingDescription commercial = new BuildingDescription("Commercial", 10, 1, new Dimension(1, 1));
+        BuildingDescription road = new BuildingDescription("Road", 10, 1, new Dimension(1, 1));
+        catalog.register(commercial);
+        PlacementValidator validator = new PlacementValidator(catalog);
+
+        assertTrue(validator.canPlace(2, 2, commercial.getTypeId(),
+                new FakeGrid(true, List.of(new BuildingInstance(road, 2, 3)))));
     }
 }
