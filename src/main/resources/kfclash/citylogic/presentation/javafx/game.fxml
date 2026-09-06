@@ -50,6 +50,9 @@
                 <Button text="House" onAction="#selectHouse" styleClass="btn-toolbar"/>
                 <Button text="Factory" onAction="#selectFactory" styleClass="btn-toolbar"/>
                 <Button text="Park" onAction="#selectPark" styleClass="btn-toolbar"/>
+                <Button text="Commercial" onAction="#selectCommercial" styleClass="btn-toolbar"/>
+                <Button text="Power Plant" onAction="#selectPowerPlant" styleClass="btn-toolbar"/>
+                <Button text="Road" onAction="#selectRoad" styleClass="btn-toolbar"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button text="Advance Tick" onAction="#advanceTime" styleClass="btn-primary"/>
             </HBox>

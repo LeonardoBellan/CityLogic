@@ -198,6 +198,21 @@ public class gameController implements ICityObserver {
     }
 
     @FXML
+    private void selectCommercial() {
+        selectedBuildingType = "commercial";
+    }
+
+    @FXML
+    private void selectPowerPlant() {
+        selectedBuildingType = "power_plant";
+    }
+
+    @FXML
+    private void selectRoad() {
+        selectedBuildingType = "road";
+    }
+
+    @FXML
     private void advanceTime() {
         if (!isPaused) {
             App.askGameEngine().advanceTime();
