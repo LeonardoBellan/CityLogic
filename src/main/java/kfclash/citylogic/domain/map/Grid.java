@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Optional;
 
 public class Grid implements IGridReadPort, IGridCommandPort {
+    public static final int POWER_PLANT_SERVICE_RADIUS = 3;
+
     private final Dimension dimensions;
     private final Cell[][] map;
     private final BuildingFactory factory;
@@ -151,6 +153,7 @@ public class Grid implements IGridReadPort, IGridCommandPort {
         
         // Add building to active building map
         activeBuildings.put(building.getId(), building);
+        refreshPowerStates();
         return building;
     }
 
@@ -187,6 +190,7 @@ public class Grid implements IGridReadPort, IGridCommandPort {
 
         // Remove building from active building map
         activeBuildings.remove(building.getId());
+        refreshPowerStates();
         return building;
     }
 
@@ -204,6 +208,43 @@ public class Grid implements IGridReadPort, IGridCommandPort {
 
     private boolean isWithinBounds(int x, int y) {
         return x >= 0 && y >= 0 && x < dimensions.getWidth() && y < dimensions.getHeight();
+    }
+
+    /** Updates operational power for buildings served by a nearby power plant. */
+    public void refreshPowerStates() {
+        List<BuildingInstance> powerPlants = activeBuildings.values().stream()
+                .filter(building -> isType(building, "POWER_PLANT", "POWERPLANT"))
+                .toList();
+
+        for (BuildingInstance building : activeBuildings.values()) {
+            if (isType(building, "ROAD", "PARK", "POWER_PLANT", "POWERPLANT")) {
+                if (isType(building, "POWER_PLANT", "POWERPLANT")) {
+                    building.setPowered(true);
+                }
+                continue;
+            }
+            building.setPowered(powerPlants.stream()
+                    .anyMatch(powerPlant -> isWithinPowerRange(building, powerPlant)));
+        }
+    }
+
+    private static boolean isWithinPowerRange(BuildingInstance building, BuildingInstance powerPlant) {
+        Point buildingPosition = building.getPosition();
+        Point plantPosition = powerPlant.getPosition();
+        int dx = Math.abs(buildingPosition.getX() - plantPosition.getX());
+        int dy = Math.abs(buildingPosition.getY() - plantPosition.getY());
+        return Math.max(dx, dy) <= POWER_PLANT_SERVICE_RADIUS;
+    }
+
+    private static boolean isType(BuildingInstance building, String... types) {
+        String normalized = building.getType().trim().toUpperCase()
+                .replaceAll("[\\s-]+", "_");
+        for (String type : types) {
+            if (normalized.equals(type)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

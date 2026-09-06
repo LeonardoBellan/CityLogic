@@ -7,6 +7,7 @@ import kfclash.citylogic.domain.core.CityAggregate;
 import kfclash.citylogic.domain.core.CitySnapshot;
 import kfclash.citylogic.domain.core.ResourceDelta;
 import kfclash.citylogic.domain.core.SimulationException;
+import kfclash.citylogic.domain.map.Grid;
 import kfclash.citylogic.ports.ICityEventPublisher;
 import kfclash.citylogic.ports.IGridReadPort;
 import kfclash.citylogic.ports.IPolicyStrategy;
@@ -91,6 +92,10 @@ public class SimulationEngine {
      *                             nessun observer è stato notificato
      */
     public synchronized void advanceTick() {
+        if (gridReader instanceof Grid grid) {
+            grid.refreshPowerStates();
+        }
+
         // 1. Backup per la transazionalità + vista read-only per le fasi
         CitySnapshot startSnapshot = cityState.exportSnapshot();
 
