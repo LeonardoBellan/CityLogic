@@ -3,7 +3,6 @@ package kfclash.citylogic.application;
 import java.util.Objects;
 
 import kfclash.citylogic.domain.buildings.BuildingDescription;
-import kfclash.citylogic.domain.map.Dimension;
 import kfclash.citylogic.ports.IGridReadPort;
 
 /**

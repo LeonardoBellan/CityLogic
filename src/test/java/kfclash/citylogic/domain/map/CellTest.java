@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import kfclash.citylogic.domain.buildings.BuildingDescription;
 import kfclash.citylogic.domain.buildings.BuildingInstance;
-import kfclash.citylogic.domain.map.Cell;
-import kfclash.citylogic.domain.map.Dimension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
