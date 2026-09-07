@@ -63,7 +63,7 @@ public class App extends Application {
     private static void initializeApplication() {
         grid = new Grid(new Dimension(12, 12), new BuildingFactory());
 
-        BuildingCatalog catalog = new BuildingCatalog();
+        catalog = new BuildingCatalog();
         ApplicationBuildingDescriptionProvider.initDefaultCatalog(catalog);
 
         CityAggregate cityState = new CityAggregate(
@@ -88,11 +88,11 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         initializeApplication();
-        scene = new Scene(loadFXML("menu"), 640, 480);
-        stage.setTitle("Simcity lite");
+        scene = new Scene(loadFXML("GameView"), 1440, 900);
+        stage.setTitle("CityLogic - Municipal Simulation");
         stage.setResizable(true);
-        stage.setMinWidth(640);
-        stage.setMinHeight(480);
+        stage.setMinWidth(1100);
+        stage.setMinHeight(720);
         stage.setScene(scene);
         stage.show();
     }
