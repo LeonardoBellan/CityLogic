@@ -2,7 +2,6 @@ package kfclash.citylogic.presentation.javafx;
 
 import javafx.fxml.FXML;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;

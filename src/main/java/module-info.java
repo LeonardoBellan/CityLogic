@@ -6,5 +6,7 @@ module kfclash.citylogic {
 
     opens kfclash.citylogic.presentation.javafx to javafx.fxml;
     exports kfclash.citylogic.persistence;
+    exports kfclash.citylogic.domain.core;
+    exports kfclash.citylogic.ports;
     exports kfclash.citylogic.presentation.javafx;
 }

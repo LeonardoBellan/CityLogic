@@ -133,7 +133,8 @@ public class SimulationEngine {
      */
     public synchronized void loadState(CitySnapshot snapshot) {
         cityState.restoreFromSnapshot(
-                Objects.requireNonNull(snapshot, "snapshot non può essere null"));
+            Objects.requireNonNull(snapshot, "snapshot non può essere null"));
+        eventPublisher.publish(cityState.exportSnapshot());
     }
 
     /**

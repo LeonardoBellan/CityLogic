@@ -31,6 +31,7 @@ class GameEngineTest {
     private static class RecordingGrid implements IGridCommandPort, IGridReadPort {
         private final List<String> constructed = new ArrayList<>();
         private int removals = 0;
+        private IBuildingState buildingToRemove;
 
         @Override
         public IBuildingState constructBuildingAt(int x, int y, BuildingDescription desc) {
@@ -41,7 +42,9 @@ class GameEngineTest {
         @Override
         public IBuildingState removeBuildingAt(int x, int y) {
             removals++;
-            return null;
+            IBuildingState removed = buildingToRemove;
+            buildingToRemove = null;
+            return removed;
         }
 
         @Override
@@ -155,6 +158,43 @@ class GameEngineTest {
         assertEquals(1, grid.constructed.size());
     }
 
+        @Test
+        void placeBuildingDeductsConstructionCost() {
+        RecordingGrid grid = new RecordingGrid();
+        BuildingCatalog catalog = new BuildingCatalog();
+        BuildingDescription description = new BuildingDescription(
+            "Test House", 120, 10, new Dimension(1, 1));
+        catalog.register(description);
+        CityAggregate city = new CityAggregate(new BigDecimal("1000"), 0, 50.0);
+        SimulationEngine simulation = new SimulationEngine(
+            city, grid, new RecordingPublisher(), new TickPhaseFactory(),
+            SimulationConfig.defaultConfig());
+        GameEngine engine = new GameEngine(grid, grid, simulation, catalog,
+            new PlacementValidator(catalog));
+
+        assertTrue(engine.placeBuilding(0, 0, description.getTypeId()));
+        assertEquals(new BigDecimal("880"), simulation.getCurrentSnapshot().budget());
+        }
+
+        @Test
+        void placeBuildingRejectsInsufficientFundsBeforeConstruction() {
+        RecordingGrid grid = new RecordingGrid();
+        BuildingCatalog catalog = new BuildingCatalog();
+        BuildingDescription description = new BuildingDescription(
+            "Expensive House", 120, 10, new Dimension(1, 1));
+        catalog.register(description);
+        CityAggregate city = new CityAggregate(new BigDecimal("100"), 0, 50.0);
+        SimulationEngine simulation = new SimulationEngine(
+            city, grid, new RecordingPublisher(), new TickPhaseFactory(),
+            SimulationConfig.defaultConfig());
+        GameEngine engine = new GameEngine(grid, grid, simulation, catalog,
+            new PlacementValidator(catalog));
+
+        assertFalse(engine.placeBuilding(0, 0, description.getTypeId()));
+        assertTrue(grid.constructed.isEmpty());
+        assertEquals(new BigDecimal("100"), simulation.getCurrentSnapshot().budget());
+        }
+
     @Test
     void advanceTimeDelegatesToSimulationEngine() {
         RecordingGrid grid = new RecordingGrid();
@@ -191,6 +231,25 @@ class GameEngineTest {
         assertFalse(engine.demolishBuilding(0, 0));
         assertEquals(1, grid.removals);
     }
+
+        @Test
+        void demolishBuildingRefundsHalfOfConstructionCostByDefault() {
+        RecordingGrid grid = new RecordingGrid();
+        BuildingCatalog catalog = new BuildingCatalog();
+        BuildingDescription description = new BuildingDescription(
+            "Test House", 120, 10, new Dimension(1, 1));
+        catalog.register(description);
+        grid.buildingToRemove = new StubBuildingState("house-1", description);
+        CityAggregate city = new CityAggregate(new BigDecimal("1000"), 0, 50.0);
+        SimulationEngine simulation = new SimulationEngine(
+            city, grid, new RecordingPublisher(), new TickPhaseFactory(),
+            SimulationConfig.defaultConfig());
+        GameEngine engine = new GameEngine(grid, grid, simulation, catalog,
+            new PlacementValidator(catalog));
+
+        assertTrue(engine.demolishBuilding(0, 0));
+        assertEquals(new BigDecimal("1060.0"), simulation.getCurrentSnapshot().budget());
+        }
 
     @Test
     void policiesAreForwardedToSimulationEngine() {
