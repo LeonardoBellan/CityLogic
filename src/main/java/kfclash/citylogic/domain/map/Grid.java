@@ -190,6 +190,13 @@ public class Grid implements IGridReadPort, IGridCommandPort {
         return building;
     }
 
+    /** Removes every building while preserving the grid dimensions. */
+    public void clearBuildings() {
+        for (BuildingInstance building : List.copyOf(activeBuildings.values())) {
+            removeBuildingAt(building.getPosition().getX(), building.getPosition().getY());
+        }
+    }
+
     private Optional<BuildingInstance> getBuildingInstanceById(String id) {
         if (id == null) {
             return Optional.empty();

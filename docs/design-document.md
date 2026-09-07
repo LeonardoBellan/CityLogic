@@ -213,6 +213,19 @@ Each phase receives the same start-of-tick snapshot and read-only grid port. A p
 
 `ProductionPhase` sums base production from powered buildings. `PolicyEvaluationPhase` evaluates active `IPolicyStrategy` instances; its detailed rules belong to the policy workstream and are intentionally not defined here.
 
+## Persistence and Repository Pattern
+
+The application supports saving and loading a complete city state as JSON without coupling the domain model to file I/O.
+
+- `CityRepository` is the repository abstraction for save and load operations.
+- `JsonCityRepository` is the infrastructure adapter implemented with Jackson.
+- `CitySaveData`, `CitySnapshotSaveData`, and `BuildingSaveData` are persistence DTOs; they keep serialization concerns outside `CityAggregate`, `Grid`, and `BuildingInstance`.
+- `CityPersistenceService` is the application service that translates between domain objects and persistence DTOs.
+
+During loading, the service first rebuilds all saved placements in a temporary grid. Unknown building types, invalid coordinates, overlapping footprints, and incompatible grid dimensions are rejected before the live grid is changed. The validated placements are then restored and the saved `CitySnapshot` is loaded into the simulation engine.
+
+This design applies the Repository pattern while preserving the domain boundary: the simulation engine depends on domain state, while only the application and persistence layers know about file paths and JSON.
+
 ## Related documents
 
 - [Map and building class diagram](Design%20Class%20Diagrams/mapDomain.md)

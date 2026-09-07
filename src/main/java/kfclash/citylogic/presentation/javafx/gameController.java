@@ -204,6 +204,15 @@ public class gameController implements ICityObserver {
         }
     }
 
+    @FXML
+    private void saveGame() {
+        try {
+            App.saveGame(1);
+        } catch (Exception error) {
+            error.printStackTrace();
+        }
+    }
+
     // ── Hover ─────────────────────────────────────────────────────────
     private void setupHover() {
         mapContainer.setOnMouseMoved(e -> {

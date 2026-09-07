@@ -12,9 +12,12 @@ public class loadController {
         String saveId = ((Button) event.getSource()).getId().toString();
         int id = Integer.parseInt(saveId.replace("loadSave", ""));
         
-        //GameEngine.loadSave(id);
-
-        App.setRoot("game");    
+        try {
+            App.loadGame(id);
+            App.setRoot("game");
+        } catch (IOException | IllegalArgumentException error) {
+            error.printStackTrace();
+        }
     }
     @FXML
     private void backToMenu() throws IOException {
