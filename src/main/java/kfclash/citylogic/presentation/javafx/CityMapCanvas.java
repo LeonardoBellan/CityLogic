@@ -16,7 +16,7 @@ import javafx.scene.text.TextAlignment;
 
 /** Dashboard canvas adapted from the demo UI to the citylogic domain APIs. */
 public class CityMapCanvas extends Canvas {
-    private static final int TILE_SIZE = 54;
+    private static final int TILE_SIZE = 40;
     private static final int PADDING = 24;
 
     private Grid grid;
