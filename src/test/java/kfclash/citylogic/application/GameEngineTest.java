@@ -59,7 +59,8 @@ class GameEngineTest {
 
         @Override
         public List<IBuildingState> getAllBuildings() {
-            return List.of();
+            BuildingDescription road = new BuildingDescription("Road", 10, 1, new Dimension(1, 1));
+            return List.of(new StubBuildingState("road-1", road, 1, 0));
         }
 
         @Override
@@ -93,10 +94,18 @@ class GameEngineTest {
     private static class StubBuildingState implements IBuildingState {
         private final String id;
         private final BuildingDescription description;
+        private final int x;
+        private final int y;
 
         private StubBuildingState(String id, BuildingDescription description) {
+            this(id, description, 0, 0);
+        }
+
+        private StubBuildingState(String id, BuildingDescription description, int x, int y) {
             this.id = id;
             this.description = description;
+            this.x = x;
+            this.y = y;
         }
 
         @Override
@@ -116,7 +125,7 @@ class GameEngineTest {
 
         @Override
         public kfclash.citylogic.domain.map.Point getPosition() {
-            return new kfclash.citylogic.domain.map.Point(0, 0);
+            return new kfclash.citylogic.domain.map.Point(x, y);
         }
 
         @Override

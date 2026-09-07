@@ -161,6 +161,34 @@ public class GridTest {
     }
 
     @Test
+    public void testBuildingsWithoutPowerPlantCoverageAreShutDown() {
+        BuildingDescription house = new BuildingDescription("House", 100, 1,
+                new Dimension(1, 1));
+        BuildingInstance building = grid.constructBuildingAt(0, 0, house);
+
+        assertFalse(building.isPowered());
+        grid.refreshPowerStates();
+
+        assertFalse(building.isPowered());
+    }
+
+    @Test
+    public void testPowerPlantPowersBuildingsWithinServiceRadiusOnly() {
+        BuildingDescription powerPlant = new BuildingDescription("Power Plant", 2000, 10,
+                new Dimension(2, 2));
+        BuildingDescription house = new BuildingDescription("House", 100, 1,
+                new Dimension(1, 1));
+        grid.constructBuildingAt(4, 4, powerPlant);
+        BuildingInstance nearbyHouse = grid.constructBuildingAt(7, 4, house);
+        BuildingInstance distantHouse = grid.constructBuildingAt(0, 0, house);
+
+        grid.refreshPowerStates();
+
+        assertTrue(nearbyHouse.isPowered());
+        assertFalse(distantHouse.isPowered());
+    }
+
+    @Test
     public void testConstructBuildingWithNullDescription() {
         assertThrows(IllegalArgumentException.class, () -> grid.constructBuildingAt(0, 0, null));
     }
