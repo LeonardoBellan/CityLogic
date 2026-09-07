@@ -38,8 +38,11 @@ public class GameViewController implements ICityObserver {
     @FXML private ToggleButton selectToolBtn;
     @FXML private ToggleButton demolishToolBtn;
     @FXML private ToggleButton houseBtn;
+    @FXML private ToggleButton commercialBtn;
     @FXML private ToggleButton factoryBtn;
     @FXML private ToggleButton parkBtn;
+    @FXML private ToggleButton powerPlantBtn;
+    @FXML private ToggleButton roadBtn;
     @FXML private ToggleButton playPauseBtn;
     @FXML private ToggleButton stepTickBtn;
     @FXML private Slider speedSlider;
@@ -121,15 +124,21 @@ public class GameViewController implements ICityObserver {
         selectToolBtn.setToggleGroup(toolToggleGroup);
         demolishToolBtn.setToggleGroup(toolToggleGroup);
         houseBtn.setToggleGroup(toolToggleGroup);
+        commercialBtn.setToggleGroup(toolToggleGroup);
         factoryBtn.setToggleGroup(toolToggleGroup);
         parkBtn.setToggleGroup(toolToggleGroup);
+        powerPlantBtn.setToggleGroup(toolToggleGroup);
+        roadBtn.setToggleGroup(toolToggleGroup);
         selectToolBtn.setSelected(true);
         toolToggleGroup.selectedToggleProperty().addListener((observable, oldValue, selected) -> {
             if (selected == selectToolBtn) activeTool = "select";
             else if (selected == demolishToolBtn) activeTool = "demolish";
             else if (selected == houseBtn) activeTool = "house";
+            else if (selected == commercialBtn) activeTool = "commercial";
             else if (selected == factoryBtn) activeTool = "factory";
             else if (selected == parkBtn) activeTool = "park";
+            else if (selected == powerPlantBtn) activeTool = "power_plant";
+            else if (selected == roadBtn) activeTool = "road";
             mapCanvas.setActiveTool(activeTool);
             setStatus("Tool: " + activeTool, false);
         });

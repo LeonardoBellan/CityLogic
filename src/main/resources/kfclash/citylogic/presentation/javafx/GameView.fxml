@@ -29,9 +29,11 @@
                 <Separator orientation="VERTICAL"/>
                 <Label text="Build" styleClass="toolbar-section-label"/>
                 <ToggleButton fx:id="houseBtn" text="🏠 House" styleClass="tool-btn tool-residential"/>
-                <ToggleButton fx:id="commercialBtn" text="🏢 Commercial" styleClass="tool-btn tool-commercial" visible="false" managed="false"/>
+                <ToggleButton fx:id="commercialBtn" text="🏢 Commercial" styleClass="tool-btn tool-commercial"/>
                 <ToggleButton fx:id="factoryBtn" text="🏭 Factory" styleClass="tool-btn tool-industrial"/>
                 <ToggleButton fx:id="parkBtn" text="🌲 Park" styleClass="tool-btn tool-civic"/>
+                <ToggleButton fx:id="powerPlantBtn" text="⚡ Power Plant" styleClass="tool-btn tool-utility"/>
+                <ToggleButton fx:id="roadBtn" text="━ Road" styleClass="tool-btn tool-road"/>
             </ToolBar>
         </VBox>
     </top>
