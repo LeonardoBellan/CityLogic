@@ -2,8 +2,6 @@ package kfclash.citylogic.domain.map;
 
 import org.junit.jupiter.api.Test;
 
-import kfclash.citylogic.domain.map.Dimension;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DimensionTest {

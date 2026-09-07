@@ -54,6 +54,7 @@
                 <Button text="Power Plant" onAction="#selectPowerPlant" styleClass="btn-toolbar"/>
                 <Button text="Road" onAction="#selectRoad" styleClass="btn-toolbar"/>
                 <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Save" onAction="#saveGame" styleClass="btn-secondary"/>
                 <Button text="Advance Tick" onAction="#advanceTime" styleClass="btn-primary"/>
             </HBox>
         </bottom>

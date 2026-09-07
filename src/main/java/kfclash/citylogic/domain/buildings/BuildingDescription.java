@@ -1,7 +1,5 @@
 package kfclash.citylogic.domain.buildings;
 
-import java.util.Objects;
-
 import kfclash.citylogic.domain.core.ResourceDelta;
 import kfclash.citylogic.domain.map.Dimension;
 
