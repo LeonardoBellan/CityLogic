@@ -31,6 +31,7 @@ public class App extends Application {
 
     private static Scene scene;
     private static Grid grid;
+    private static BuildingCatalog catalog;
     private static GameEngine gameEngine;
     private static SimulationEngine simulationEngine;
     private static CityEventPublisher eventPublisher;
@@ -63,11 +64,11 @@ public class App extends Application {
     private static void initializeApplication() {
         grid = new Grid(new Dimension(12, 12), new BuildingFactory());
 
-        BuildingCatalog catalog = new BuildingCatalog();
+        catalog = new BuildingCatalog();
         ApplicationBuildingDescriptionProvider.initDefaultCatalog(catalog);
 
         CityAggregate cityState = new CityAggregate(
-                new BigDecimal("50000.00"), 4200, 74.0);
+                new BigDecimal("10000.00"), 4200, 74.0);
         eventPublisher = new CityEventPublisher();
         simulationEngine = new SimulationEngine(
                 cityState,
@@ -88,12 +89,17 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         initializeApplication();
-        scene = new Scene(loadFXML("menu"), 640, 480);
-        stage.setTitle("Simcity lite");
+        
+        scene = new Scene(loadFXML("GameView"), 1100, 720); 
+        
+        stage.setTitle("CityLogic - Municipal Simulation");
         stage.setResizable(true);
-        stage.setMinWidth(640);
-        stage.setMinHeight(480);
+        stage.setMinWidth(1100);
+        stage.setMinHeight(720);
         stage.setScene(scene);
+        
+        stage.setMaximized(true); 
+        
         stage.show();
     }
 
